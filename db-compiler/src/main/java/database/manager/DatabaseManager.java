@@ -1,10 +1,10 @@
 package database.manager;
 
-import database.metadata.ColumnDeff;
+import database.metadata.ColumnDef;
 import database.metadata.DataType;
-import database.metadata.TableDeff;
-import database.metadata.interfaces.IColumnDeff;
-import database.metadata.interfaces.ITableDeff;
+import database.metadata.TableDef;
+import database.metadata.interfaces.IColumnDef;
+import database.metadata.interfaces.ITableDef;
 
 public final class DatabaseManager {
 
@@ -17,16 +17,16 @@ public final class DatabaseManager {
 		return INSTANCE;
 	}
 
-	public static ITableDeff createTable(String name) {
-		return new TableDeff(name);
+	public static ITableDef createTable(String name) {
+		return new TableDef(name);
 	}
 
-	public static ITableDeff createTable(String name, IColumnDeff... columnsDeff) {
-		return new TableDeff(name, columnsDeff);
+	public static ITableDef createTable(String name, IColumnDef... columnsDeff) {
+		return new TableDef(name, columnsDeff);
 	}
 
-	public static IColumnDeff createColumnDeff(String name, DataType dataType, Number maxValue) {
-		return new ColumnDeff(name, dataType, maxValue);
+	public static IColumnDef createColumnDeff(String name, DataType dataType, Number maxValue) {
+		return new ColumnDef(name, dataType, maxValue);
 	}
 
 }

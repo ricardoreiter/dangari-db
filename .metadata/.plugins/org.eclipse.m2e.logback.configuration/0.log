@@ -1,0 +1,47 @@
+2015-09-14 19:38:23,107 [Worker-8] INFO  o.e.m.c.i.l.LifecycleMappingFactory - Using org.eclipse.m2e.jdt.JarLifecycleMapping lifecycle mapping for MavenProject: database:teste:0.0.1-SNAPSHOT @ C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\pom.xml.
+2015-09-14 19:38:24,151 [Worker-8] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:38:24,151 [Worker-8] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:38:24,154 [Worker-8] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:38:24,154 [Worker-8] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:38:26,753 [Worker-22] INFO  o.e.m.c.i.l.LifecycleMappingFactory - Using org.eclipse.m2e.jdt.JarLifecycleMapping lifecycle mapping for MavenProject: database:teste:0.0.1-SNAPSHOT @ C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\pom.xml.
+2015-09-14 19:40:58,634 [Worker-8] INFO  o.e.m.c.i.p.ProjectConfigurationManager - Update started
+2015-09-14 19:41:02,411 [Worker-8] INFO  o.e.m.c.i.l.LifecycleMappingFactory - Using org.eclipse.m2e.jdt.JarLifecycleMapping lifecycle mapping for MavenProject: database:teste:0.0.1-SNAPSHOT @ C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\pom.xml.
+2015-09-14 19:41:02,961 [Worker-8] INFO  o.e.m.j.i.AbstractJavaProjectConfigurator - Adding source folder /db-compiler/src/main/java
+2015-09-14 19:41:02,962 [Worker-8] INFO  o.e.m.j.i.AbstractJavaProjectConfigurator - Adding source folder /db-compiler/src/test/java
+2015-09-14 19:41:03,451 [Worker-8] INFO  o.e.m.c.i.p.ProjectConfigurationManager - Update completed: 4 sec
+2015-09-14 19:41:04,588 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:04,589 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:41:04,591 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:04,591 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:41:35,826 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:35,827 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:41:35,828 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:35,828 [Worker-20] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:41:43,821 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:43,821 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:41:43,822 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:43,823 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:41:49,259 [Worker-23] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:49,259 [Worker-23] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:41:49,261 [Worker-23] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:41:49,261 [Worker-23] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:42:13,746 [Worker-24] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:13,747 [Worker-24] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:42:13,748 [Worker-24] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:13,748 [Worker-24] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:42:23,774 [Worker-22] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:23,776 [Worker-22] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:42:23,778 [Worker-22] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:23,778 [Worker-22] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:42:31,956 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:31,957 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:42:31,960 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:31,961 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:42:40,777 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:40,777 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:42:40,780 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:40,780 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
+2015-09-14 19:42:49,230 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:49,231 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\main\resources
+2015-09-14 19:42:49,233 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2015-09-14 19:42:49,234 [Worker-25] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\workspaces\faculdade\database\trabalho\sgbd\db-compiler\src\test\resources
