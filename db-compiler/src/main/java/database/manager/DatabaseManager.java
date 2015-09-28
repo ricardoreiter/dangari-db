@@ -8,7 +8,7 @@ import database.metadata.interfaces.ITableDef;
 
 public final class DatabaseManager {
 
-	private final static DatabaseManager INSTANCE = new DatabaseManager();
+	public final static DatabaseManager INSTANCE = new DatabaseManager();
 
 	private DatabaseManager() {
 	}
