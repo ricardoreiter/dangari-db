@@ -31,6 +31,13 @@ import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import database.gals.LexicalError;
+import database.gals.Lexico;
+import database.gals.SemanticError;
+import database.gals.Semantico;
+import database.gals.Sintatico;
+import database.gals.SyntaticError;
+
 public class SGBDView extends JFrame implements ActionListener {
 
 	static {
@@ -54,6 +61,7 @@ public class SGBDView extends JFrame implements ActionListener {
 	private final JButton btnExportar = new JButton();
 	private final JButton btnLimpar = new JButton();
 	private final Result result = new Result();
+	private JTextArea txtSql;
 
 	public SGBDView() {
 		addDadosFakes(); // TODO apagar
@@ -63,7 +71,7 @@ public class SGBDView extends JFrame implements ActionListener {
 		panelBotton.add(spBottom, BorderLayout.CENTER);
 		panelBotton.add(toolBar, BorderLayout.SOUTH);
 		final JPanel painelCentroTop = new JPanel(new BorderLayout());
-		final JTextArea txtSql = new JTextArea();
+		txtSql = new JTextArea();
 		txtSql.setBorder(new NumberedBorder());
 		final JScrollPane spTop = new JScrollPane(txtSql);
 		final JPanel principal = new JPanel(new BorderLayout());
@@ -72,6 +80,27 @@ public class SGBDView extends JFrame implements ActionListener {
 		painelCentroTop.add(spTop, BorderLayout.CENTER);
 		final JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		btnExecutar.setToolTipText("F5 - Executar o comando SQL");
+		
+		
+		// TODO: Teste
+		btnExecutar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Lexico lexico = new Lexico(txtSql.getText());
+				Sintatico sintatico = new Sintatico();
+				try {
+					sintatico.parse(lexico, new Semantico());
+				} catch (LexicalError e1) {
+					e1.printStackTrace();
+				} catch (SyntaticError e1) {
+					e1.printStackTrace();
+				} catch (SemanticError e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
 		btnImportar.setToolTipText("F7 - Importar comandos SQL de um arquivo");
 		btnExportar.setToolTipText("F8 - Exportar comandos SQL para um arquivo");
 		btnLimpar.setToolTipText("F9 - Limpar");
@@ -203,7 +232,6 @@ public class SGBDView extends JFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-
 	}
 
 }

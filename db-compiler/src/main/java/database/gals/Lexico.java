@@ -13,6 +13,10 @@ public class Lexico implements Constants {
 		setInput(input);
 	}
 
+	public Lexico(String text) {
+		this.input = text;
+	}
+
 	public void setInput(java.io.Reader input) {
 		StringBuffer bfr = new StringBuffer();
 		try {
