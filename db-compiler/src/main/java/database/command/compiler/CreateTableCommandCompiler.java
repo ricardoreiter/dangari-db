@@ -12,7 +12,7 @@ import database.gals.Token;
 /**
  * @author ricardo.reiter
  */
-public class InsertCommandCompiler implements ICommandCompiler {
+public class CreateTableCommandCompiler implements ICommandCompiler {
 
     /* (non-Javadoc)
      * @see database.command.compiler.ICommandCompiler#accept(int, database.gals.Token)
