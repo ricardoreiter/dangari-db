@@ -1,32 +1,26 @@
 package database.manager;
 
-import database.metadata.ColumnDef;
-import database.metadata.DataType;
-import database.metadata.TableDef;
-import database.metadata.interfaces.IColumnDef;
-import database.metadata.interfaces.ITableDef;
+import database.metadata.interfaces.IDatabaseDef;
 
 public final class DatabaseManager {
 
-	public final static DatabaseManager INSTANCE = new DatabaseManager();
+    public final static DatabaseManager INSTANCE = new DatabaseManager();
 
-	private DatabaseManager() {
-	}
+    private IDatabaseDef database;
 
-	public static DatabaseManager getInstance() {
-		return INSTANCE;
-	}
+    private DatabaseManager() {
+    }
 
-	public static ITableDef createTable(String name) {
-		return new TableDef(name);
-	}
+    public static DatabaseManager getInstance() {
+        return INSTANCE;
+    }
 
-	public static ITableDef createTable(String name, IColumnDef... columnsDeff) {
-		return new TableDef(name, columnsDeff);
-	}
+    public void setDatabase(IDatabaseDef database) {
+        this.database = database;
+    }
 
-	public static IColumnDef createColumnDeff(String name, DataType dataType, Number maxValue) {
-		return new ColumnDef(name, dataType, maxValue);
-	}
+    public IDatabaseDef getDatabase() {
+        return this.database;
+    }
 
 }

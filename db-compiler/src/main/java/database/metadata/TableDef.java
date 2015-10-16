@@ -7,92 +7,91 @@ import java.util.Map;
 
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.ITableDef;
-import database.utils.Fn;
 
 public class TableDef implements ITableDef {
 
-	private String name;
-	private int rowsCount;
-	private Map<String, IColumnDef> columns = new LinkedHashMap<>();
+    private String name;
+    private int rowsCount;
+    private Map<String, IColumnDef> columns = new LinkedHashMap<>();
 
-	public TableDef(String name) {
-		setName(name);
-	}
+    public TableDef(String name) {
+        setName(name);
+    }
 
-	public TableDef(String name, IColumnDef... columnsDeff) {
-		this(name);
-		columns = Fn.map(c -> c.getName(), columnsDeff);
-	}
+    public TableDef(String name, IColumnDef... columnsDeff) {
+        this(name);
+        //		columns = Fn.map(c -> c.getName(), columnsDeff);
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public void setName(String name) {
-		checkName(name);
-		this.name = name;
-	}
+    @Override
+    public void setName(String name) {
+        checkName(name);
+        this.name = name;
+    }
 
-	@Override
-	public int getColumnsCount() {
-		return columns.size();
-	}
+    @Override
+    public int getColumnsCount() {
+        return columns.size();
+    }
 
-	@Override
-	public int getRowsCount() {
-		return rowsCount;
-	}
+    @Override
+    public int getRowsCount() {
+        return rowsCount;
+    }
 
-	@Override
-	public void incrementRowsCount() {
-		rowsCount++;
-	}
+    @Override
+    public void incrementRowsCount() {
+        rowsCount++;
+    }
 
-	@Override
-	public void decrementRowsCount() {
-		rowsCount--;
-	}
+    @Override
+    public void decrementRowsCount() {
+        rowsCount--;
+    }
 
-	@Override
-	public IColumnDef getColumnDeff(String column) {
-		return columns.get(column);
-	}
+    @Override
+    public IColumnDef getColumnDef(String column) {
+        return columns.get(column);
+    }
 
-	@Override
-	public void addColumnDeff(IColumnDef column) {
-		checkColumn(column);
-		String key = column.getName();
-		columns.put(key, column);
-	}
+    @Override
+    public void addColumnDef(IColumnDef column) {
+        checkColumn(column);
+        String key = column.getName();
+        columns.put(key, column);
+    }
 
-	@Override
-	public List<IColumnDef> getColumns() {
-		return new ArrayList<>(columns.values());
-	}
+    @Override
+    public List<IColumnDef> getColumns() {
+        return new ArrayList<>(columns.values());
+    }
 
-	private void checkName(String name) {
-		if (name == null || name.isEmpty()) {
-			throw new RuntimeException("O nome da tabela não pode ser nulo ou vazio");
-		}
-	}
+    private void checkName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new RuntimeException("O nome da tabela não pode ser nulo ou vazio");
+        }
+    }
 
-	private void checkColumn(IColumnDef column) {
-		if (column == null) {
-			throw new RuntimeException("Não é possível adicionar uma coluna nula");
-		}
+    private void checkColumn(IColumnDef column) {
+        if (column == null) {
+            throw new RuntimeException("Não é possível adicionar uma coluna nula");
+        }
 
-		String key = column.getName();
-		if (columns.containsKey(key)) {
-			throw new RuntimeException(String.format("Já existe uma coluna com o nome %s", column));
-		}
-	}
+        String key = column.getName();
+        if (columns.containsKey(key)) {
+            throw new RuntimeException(String.format("Já existe uma coluna com o nome %s", column));
+        }
+    }
 
-	@Override
-	public void deleteColumnDeff(String column) {
-		columns.remove(column);
+    @Override
+    public void deleteColumnDef(String column) {
+        columns.remove(column);
 
-	}
+    }
 
 }
