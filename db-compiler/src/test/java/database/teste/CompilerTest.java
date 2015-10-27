@@ -240,4 +240,74 @@ public class CompilerTest {
         }
     }
 
+    @Test
+    public void testInsert001() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("INSERT INTO empresa (cod, nome) VALUES (1, \"Ricardo Reiter\");");
+    }
+
+    @Test
+    public void testInsert002() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (cod) VALUES (2);");
+    }
+
+    @Test
+    public void testInsert003() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("INSERT INTO empresa (nome) VALUES (NULL);");
+    }
+
+    @Test
+    public void testInsert004() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (cod) VALUES (NULL);");
+    }
+
+    @Test
+    public void testInsert_Error001() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO tabelaNaoExistente (cod) VALUES (NULL);");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tabela [tabelaNaoExistente] não existe", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error002() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (codigo) VALUES (NULL);");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Campo [codigo] não existe na tabela [usuario]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error003() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, cod) VALUES (NULL);");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Quantidade de campos informados é diferente da quantidade de valores informados", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error004() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, cod) VALUES (NULL, \"Teste\");");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tipo [LITERAL] incompatível com o campo [cod]. Era esperado um [NUMBER]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error005() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, cod) VALUES (1, \"Teste\");");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tipo [NUMBER] incompatível com o campo [nome]. Era esperado um [VARCHAR]", e.getMessage());
+        }
+    }
+
 }

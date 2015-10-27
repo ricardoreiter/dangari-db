@@ -27,7 +27,9 @@ public class Semantico implements Constants {
             case 20:
                 compiler = new CreateTableCommandCompiler();
             case 30:
-                compiler = new InsertCommandCompiler();
+                if (compiler == null) {
+                    compiler = new InsertCommandCompiler();
+                }
             case 40: // Início de reconhecimento do select
                 if (compiler == null) {
                     compiler = new SelectCommandCompiler();

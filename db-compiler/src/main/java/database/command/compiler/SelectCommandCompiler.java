@@ -1,7 +1,6 @@
 package database.command.compiler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import database.command.SelectCommandExecutor;
 import database.gals.SemanticError;
 import database.gals.Token;
 import database.manager.DatabaseManager;
-import database.metadata.DataType;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
@@ -24,31 +22,12 @@ public class SelectCommandCompiler implements ICommandCompiler {
 
     private boolean isCompilingWhere = false;
 
-    private enum WhereDataType {
-        NUMBER, LITERAL, NULL, FIELD
-    }
-
-    // Mapeamento dos tipos que podem ocorrer no where, com os tipos de campos que existem
-    private static HashMap<DataType, List<WhereDataType>> dataTypeToWhereDataTypeMap = new HashMap<>();
-    {
-        LinkedList<WhereDataType> typeList = new LinkedList<>();
-        typeList.add(WhereDataType.LITERAL);
-        typeList.add(WhereDataType.NULL);
-        dataTypeToWhereDataTypeMap.put(DataType.CHAR, typeList);
-        dataTypeToWhereDataTypeMap.put(DataType.VARCHAR, typeList);
-
-        typeList = new LinkedList<>();
-        typeList.add(WhereDataType.NUMBER);
-        typeList.add(WhereDataType.NULL);
-        dataTypeToWhereDataTypeMap.put(DataType.NUMBER, typeList);
-    }
-
     private class WhereCondition {
 
         public LinkedList<String> right;
         public LinkedList<String> left;
         public String relationalOperation;
-        public WhereDataType dataType;
+        public CompilerDataType dataType;
     }
 
     @Override
@@ -56,17 +35,17 @@ public class SelectCommandCompiler implements ICommandCompiler {
         System.out.println("SELECT_COMMAND_COMPILER - Ação #" + action + ", Token: " + token);
         switch (action) {
             case 10:
-                whereConditions.getLast().dataType = WhereDataType.NUMBER;
+                whereConditions.getLast().dataType = CompilerDataType.NUMBER;
                 whereConditions.getLast().right = new LinkedList<>();
                 whereConditions.getLast().right.add(token.getLexeme());
                 break;
             case 11:
-                whereConditions.getLast().dataType = WhereDataType.LITERAL;
+                whereConditions.getLast().dataType = CompilerDataType.LITERAL;
                 whereConditions.getLast().right = new LinkedList<>();
                 whereConditions.getLast().right.add(token.getLexeme());
                 break;
             case 12:
-                whereConditions.getLast().dataType = WhereDataType.NULL;
+                whereConditions.getLast().dataType = CompilerDataType.NULL;
                 whereConditions.getLast().right = new LinkedList<>();
                 whereConditions.getLast().right.add(token.getLexeme());
                 break;
@@ -75,7 +54,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
                     if (whereConditions.size() > 0 && whereConditions.getLast().relationalOperation != null) {
                         whereConditions.getLast().right = new LinkedList<>();
                         whereConditions.getLast().right.add(token.getLexeme());
-                        whereConditions.getLast().dataType = WhereDataType.FIELD;
+                        whereConditions.getLast().dataType = CompilerDataType.FIELD;
                     } else {
                         WhereCondition wc = new WhereCondition();
                         wc.left = new LinkedList<>();
@@ -203,13 +182,13 @@ public class SelectCommandCompiler implements ICommandCompiler {
         ArrayList<String> checkedFields = new ArrayList<String>();
         IColumnDef columnDef = checkSelectedField(database, whereCondition.left, checkedFields, false);
 
-        if (whereCondition.dataType == WhereDataType.FIELD) {
+        if (whereCondition.dataType == CompilerDataType.FIELD) {
             IColumnDef rightColumn = checkSelectedField(database, whereCondition.right, checkedFields, false);
             if (columnDef.getDataType() != rightColumn.getDataType()) {
                 throw new SemanticError("Tipos incompatíveis, " + columnDef.getDataType() + " e " + rightColumn.getDataType());
             }
         } else {
-            if (!dataTypeToWhereDataTypeMap.get(columnDef.getDataType()).contains(whereCondition.dataType)) {
+            if (!whereCondition.dataType.getDataTypes().contains(columnDef.getDataType())) {
                 throw new SemanticError("Tipos incompatíveis, " + columnDef.getDataType() + " e " + whereCondition.dataType);
             }
         }
