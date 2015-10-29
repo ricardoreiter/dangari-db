@@ -261,6 +261,16 @@ public class CompilerTest {
     }
 
     @Test
+    public void testInsert005() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, caractere) VALUES (\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\");");
+    }
+
+    @Test
+    public void testInsert006() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (caractere) VALUES (NULL);");
+    }
+
+    @Test
     public void testInsert_Error001() throws LexicalError, SyntaticError, SemanticError {
         try {
             List<ICommandExecutor> commandExecutor = compile("INSERT INTO tabelaNaoExistente (cod) VALUES (NULL);");
@@ -307,6 +317,46 @@ public class CompilerTest {
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
             Assert.assertEquals("Tipo [NUMBER] incompatível com o campo [nome]. Era esperado um [VARCHAR]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error006() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, cod) VALUES (\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", 1);");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tamanho do VARCHAR informado diferente do tamanho do campo, era esperando um VARCHAR com até [100] caracteres, mas encontrou [102]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error007() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (caractere, cod) VALUES (\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", 1);");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tamanho do CHARACTER informado diferente do tamanho do campo, era esperando um CHARACTER com [100] caracteres, mas encontrou [102]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error008() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (caractere, cod) VALUES (\"sasd\", 1);");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tamanho do CHARACTER informado diferente do tamanho do campo, era esperando um CHARACTER com [100] caracteres, mas encontrou [4]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error009() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (caractere, cod) VALUES (1, 1);");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tipo [NUMBER] incompatível com o campo [caractere]. Era esperado um [CHAR]", e.getMessage());
         }
     }
 

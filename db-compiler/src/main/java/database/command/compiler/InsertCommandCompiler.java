@@ -6,16 +6,13 @@
 package database.command.compiler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import database.command.ICommandExecutor;
 import database.gals.SemanticError;
 import database.gals.Token;
 import database.manager.DatabaseManager;
+import database.metadata.DataType;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
@@ -27,20 +24,36 @@ public class InsertCommandCompiler implements ICommandCompiler {
 
     private String table;
     private LinkedList<String> fields = new LinkedList<>();
-    private HashMap<String, CompilerDataType> values = new LinkedHashMap<>();
+
+    private class InsertValue {
+
+        String value;
+        CompilerDataType type;
+    }
+
+    private LinkedList<InsertValue> values = new LinkedList<>();
 
     @Override
     public void accept(int action, Token token) {
         System.out.println("SELECT_COMMAND_COMPILER - Ação #" + action + ", Token: " + token);
         switch (action) {
             case 10:
-                values.put(token.getLexeme(), CompilerDataType.NUMBER);
+                InsertValue value = new InsertValue();
+                value.value = token.getLexeme().replace("\"", "");
+                value.type = CompilerDataType.NUMBER;
+                values.add(value);
                 break;
             case 11:
-                values.put(token.getLexeme(), CompilerDataType.LITERAL);
+                value = new InsertValue();
+                value.value = token.getLexeme().replace("\"", "");
+                value.type = CompilerDataType.LITERAL;
+                values.add(value);
                 break;
             case 12:
-                values.put(token.getLexeme(), CompilerDataType.NULL);
+                value = new InsertValue();
+                value.value = token.getLexeme().replace("\"", "");
+                value.type = CompilerDataType.NULL;
+                values.add(value);
                 break;
             case 30:
                 table = token.getLexeme();
@@ -76,12 +89,26 @@ public class InsertCommandCompiler implements ICommandCompiler {
             throw new SemanticError("Quantidade de campos informados é diferente da quantidade de valores informados");
         }
 
-        Set<Entry<String, CompilerDataType>> entrySet = values.entrySet();
         int i = 0;
-        for (Entry<String, CompilerDataType> entry : entrySet) {
-            CompilerDataType compilerDataType = entry.getValue();
-            if (!compilerDataType.getDataTypes().contains(columns.get(i).getDataType())) {
-                throw new SemanticError(String.format("Tipo [%s] incompatível com o campo [%s]. Era esperado um [%s]", compilerDataType, columns.get(i).getName(), columns.get(i).getDataType()));
+        for (InsertValue insertValue : values) {
+            CompilerDataType compilerDataType = insertValue.type;
+            IColumnDef columnDef = columns.get(i);
+            if (!compilerDataType.getDataTypes().contains(columnDef.getDataType())) {
+                throw new SemanticError(String.format("Tipo [%s] incompatível com o campo [%s]. Era esperado um [%s]", compilerDataType, columnDef.getName(), columnDef.getDataType()));
+            }
+
+            if (compilerDataType == CompilerDataType.LITERAL) {
+                int columnCapacity = columnDef.getCapacity().intValue();
+                int literalSize = insertValue.value.length();
+                if (columnDef.getDataType() == DataType.CHAR) {
+                    if (columnCapacity != literalSize) {
+                        throw new SemanticError(String.format("Tamanho do CHARACTER informado diferente do tamanho do campo, era esperando um CHARACTER com [%s] caracteres, mas encontrou [%s]", columnCapacity, literalSize));
+                    }
+                } else {
+                    if (literalSize > columnCapacity) {
+                        throw new SemanticError(String.format("Tamanho do VARCHAR informado diferente do tamanho do campo, era esperando um VARCHAR com até [%s] caracteres, mas encontrou [%s]", columnCapacity, literalSize));
+                    }
+                }
             }
             i++;
         }

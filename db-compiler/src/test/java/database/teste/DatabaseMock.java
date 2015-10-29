@@ -32,11 +32,17 @@ public class DatabaseMock implements IDatabaseDef {
         column = createColumnDef("nome", DataType.VARCHAR, 100);
         table.addColumnDef(column);
 
+        column = createColumnDef("caractere", DataType.CHAR, 100);
+        table.addColumnDef(column);
+
         table = createTable("empresa");
         column = createColumnDef("cod", DataType.NUMBER, 100);
         table.addColumnDef(column);
 
         column = createColumnDef("nome", DataType.VARCHAR, 100);
+        table.addColumnDef(column);
+
+        column = createColumnDef("caractere", DataType.CHAR, 100);
         table.addColumnDef(column);
     }
 
