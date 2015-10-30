@@ -1,33 +1,19 @@
 package database.utils;
 
 public class NotEqualsValueComparator extends AbstractValueComparator {
-	
-	public NotEqualsValueComparator(int constantValue) {
-		super(constantValue);
-	}
-	
-	public NotEqualsValueComparator(String constantValue) {
-		super(constantValue);
-	}
 
-	@Override
-	public boolean isValid(int value) {
-		return constantInt != value;
-	}
+    public NotEqualsValueComparator(Object constantValue) {
+        super(constantValue);
+    }
 
-	@Override
-	public boolean isValid(int valueA, int valueB) {
-		return valueA != valueB;
-	}
+    @Override
+    public boolean isValid(Object valueRight) {
+        return !constantValue.equals(valueRight);
+    }
 
-	@Override
-	public boolean isValid(String value) {
-		return !constantString.equals(value);
-	}
-
-	@Override
-	public boolean isValid(String valueA, String valueB) {
-		return !valueA.equals(valueB);
-	}
+    @Override
+    public boolean isValid(Object valueA, Object valueB) {
+        return !valueA.equals(valueB);
+    }
 
 }

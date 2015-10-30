@@ -1,24 +1,24 @@
 package database.utils;
 
+import database.metadata.interfaces.IColumnDef;
+
 public abstract class AbstractValueComparator {
 
-	protected final int constantInt;
-	protected final String constantString;
-	
-	public abstract boolean isValid(int value);
-	public abstract boolean isValid(int valueA, int valueB);
-	public abstract boolean isValid(String value);
-	public abstract boolean isValid(String valueA, String valueB);
-	
-	public AbstractValueComparator(int constantValue) {
-		this.constantInt = constantValue;
-		this.constantString = "";
-	}
-	
-	public AbstractValueComparator(String constantValue) {
-		this.constantString = constantValue;
-		this.constantInt = 0;
-	}
-	
-	
+    protected int order;
+    protected final Object constantValue;
+    protected IColumnDef columnLeft;
+    protected IColumnDef columnRight;
+
+    public abstract boolean isValid(Object valueRight);
+
+    public abstract boolean isValid(Object valueA, Object valueB);
+
+    public AbstractValueComparator(Object constantValue) {
+        this.constantValue = constantValue;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
 }
