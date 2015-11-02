@@ -22,6 +22,18 @@ public final class Fn {
 		return map;
 	}
 
+	public static <V> void apply(Function<V, ?> predicate, V[] array) {
+		if (array == null) {
+			return;
+		}
+
+		for (V v : array) {
+			if (v != null) {
+				predicate.apply(v);
+			}
+		}
+	}
+
 	public static <V, R> R maybe(Function<V, R> function, V any) {
 		return any != null ? function.apply(any) : null;
 	}

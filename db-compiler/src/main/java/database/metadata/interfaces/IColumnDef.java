@@ -12,8 +12,8 @@ public interface IColumnDef {
 
 	void setDataType(DataType dataType);
 
-	Number getCapacity();
+	int getCapacity();
 
-	void setCapacity(Number capacity);
+	void setCapacity(int capacity);
 
 }

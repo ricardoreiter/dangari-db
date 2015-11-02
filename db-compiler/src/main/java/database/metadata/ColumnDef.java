@@ -6,14 +6,14 @@ public class ColumnDef implements IColumnDef {
 
 	private String name;
 	private DataType dataType;
-	private Number capacity;
+	private int capacity;
 
 	@Override
 	public String getName() {
 		return name;
 	}
 
-	public ColumnDef(String name, DataType dataType, Number capacity) {
+	public ColumnDef(String name, DataType dataType, int capacity) {
 		setName(name);
 		setDataType(dataType);
 		setCapacity(capacity);
@@ -37,12 +37,12 @@ public class ColumnDef implements IColumnDef {
 	}
 
 	@Override
-	public Number getCapacity() {
+	public int getCapacity() {
 		return capacity;
 	}
 
 	@Override
-	public void setCapacity(Number capacity) {
+	public void setCapacity(int capacity) {
 		checkCapacity(capacity);
 		this.capacity = capacity;
 	}

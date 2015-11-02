@@ -5,9 +5,14 @@
  */
 package database.metadata;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
+import database.storage.DatabaseStorage;
 
 /**
  * Esta é a implementação concreta, que terá ligação com o sistema de arquivos
@@ -16,36 +21,36 @@ import database.metadata.interfaces.ITableDef;
  */
 public class DatabaseDef implements IDatabaseDef {
 
-    /* (non-Javadoc)
-     * @see database.metadata.interfaces.IDatabaseDef#getTableDef(java.lang.String)
-     */
-    @Override
-    public ITableDef getTableDef(String tableName) {
-        return null;
-    }
+	private Map<ITableDef, File> tables = new HashMap<>();
 
-    /* (non-Javadoc)
-     * @see database.metadata.interfaces.IDatabaseDef#createTable(java.lang.String)
-     */
-    @Override
-    public ITableDef createTable(String name) {
-        return null;
-    }
+	@Override
+	public ITableDef getTableDef(String tableName) {
+		return null;
+	}
 
-    /* (non-Javadoc)
-     * @see database.metadata.interfaces.IDatabaseDef#createTable(java.lang.String, database.metadata.interfaces.IColumnDef[])
-     */
-    @Override
-    public ITableDef createTable(String name, IColumnDef... columnsDeff) {
-        return null;
-    }
+	@Override
+	public ITableDef createTable(String name) {
+		return null;
+	}
 
-    /* (non-Javadoc)
-     * @see database.metadata.interfaces.IDatabaseDef#createColumnDef(java.lang.String, database.metadata.DataType, java.lang.Number)
-     */
-    @Override
-    public IColumnDef createColumnDef(String name, DataType dataType, Number maxValue) {
-        return null;
-    }
+	@Override
+	public ITableDef createTable(String name, IColumnDef... columnsDeff) {
+		return null;
+	}
+
+	@Override
+	public IColumnDef createColumnDef(String name, DataType dataType, int maxValue) {
+		return null;
+	}
+
+	public void insert(ITableDef tableDef, Map<ColumnDef, Object> values) {
+		File file = tables.get(tableDef);
+
+		if (file == null) {
+			throw new RuntimeException(String.format("Não foi encontrada a tabela %s", tableDef.getName()));
+		}
+
+		DatabaseStorage.insertRecord(file, tableDef, values);
+	}
 
 }

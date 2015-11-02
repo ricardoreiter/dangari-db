@@ -18,6 +18,6 @@ public interface IDatabaseDef {
 
     ITableDef createTable(String name, IColumnDef... columnsDeff);
 
-    IColumnDef createColumnDef(String name, DataType dataType, Number maxValue);
+    IColumnDef createColumnDef(String name, DataType dataType, int maxValue);
 
 }
