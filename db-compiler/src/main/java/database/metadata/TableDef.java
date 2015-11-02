@@ -7,6 +7,7 @@ import java.util.Map;
 
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.ITableDef;
+import database.utils.Fn;
 
 public class TableDef implements ITableDef {
 
@@ -18,14 +19,20 @@ public class TableDef implements ITableDef {
 		setName(name);
 	}
 
-	public TableDef(String name, IColumnDef... columnsDeff) {
+	public TableDef(String name, IColumnDef... columnsDef) {
 		this(name);
-		// columns = Fn.map(c -> c.getName(), columnsDeff);
+		this.rowsCount = 0;
+		this.mapColumns(columnsDef);
 	}
 
-	public TableDef(String name, int rowsCount, IColumnDef... columnsDeff) {
+	public TableDef(String name, int rowsCount, IColumnDef... columnsDef) {
 		this(name);
-		// columns = Fn.map(c -> c.getName(), columnsDeff);
+		this.rowsCount = rowsCount;
+		this.mapColumns(columnsDef);
+	}
+
+	private void mapColumns(IColumnDef[] defs) {
+		columns = Fn.map(c -> c.getName(), defs);
 	}
 
 	@Override

@@ -33,11 +33,7 @@ public class DefStorage {
 	public void setTableDef(File table, ITableDef tableDef) {
 		File def = getTableDefFile(table);
 
-		writeTableDef(def, tableDef);
-	}
-
-	private void writeTableDef(File def, ITableDef tableDef) {
-		byte[] buffer = new byte[TABLE_DEF_SIZE];
+		byte[] buffer = getTableDefBuffer(tableDef);
 
 		try (FileOutputStream out = new FileOutputStream(def, false)) {
 			out.write(buffer);
@@ -45,11 +41,26 @@ public class DefStorage {
 			throw new RuntimeException(e);
 		}
 
-		List<IColumnDef> columnsDef = tableDef.getColumns();
-		writeColumnsDef(def, columnsDef);
 	}
 
-	private void writeColumnsDef(File def, List<IColumnDef> columnsDef) {
+	private byte[] getTableDefBuffer(ITableDef tableDef) {
+		byte[] buffer = new byte[TABLE_DEF_SIZE];
+
+		String name = tableDef.getName();
+		DataUtils.writeString(name, 90, buffer, 0);
+
+		int rowsCount = tableDef.getRowsCount();
+		DataUtils.writeInt(rowsCount, buffer, 90);
+
+		buffer[94] = (byte) tableDef.getColumnsCount();
+
+		List<IColumnDef> columnsDef = tableDef.getColumns();
+		byte[] columnsBuffer = getColumnsDefBuffer(columnsDef);
+
+		return DataUtils.join(buffer, columnsBuffer);
+	}
+
+	private byte[] getColumnsDefBuffer(List<IColumnDef> columnsDef) {
 		int coulmnsCount = columnsDef.size();
 
 		byte[] buffer = new byte[coulmnsCount * COLUMN_DEF_SIZE];
@@ -70,11 +81,7 @@ public class DefStorage {
 			offset += 1;
 		}
 
-		try (FileOutputStream out = new FileOutputStream(def, false)) {
-			out.write(buffer);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return buffer;
 	}
 
 	private ITableDef readTableDef(File def) {

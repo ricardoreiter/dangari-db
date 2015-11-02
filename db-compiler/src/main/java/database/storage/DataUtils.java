@@ -20,7 +20,7 @@ public class DataUtils {
 			e.printStackTrace();
 		}
 
-		return str;
+		return str.trim();
 	}
 
 	public static int readInt(byte[] buffer, int offset) {
@@ -37,7 +37,6 @@ public class DataUtils {
 
 	public static void writeString(String value, int size, byte[] buffer, int offset) {
 		byte[] strBuffer = getUTFBuffer(value);
-		;
 
 		for (int index = offset, i = 0; i < size; index++, i++) {
 			buffer[index] = i < strBuffer.length ? strBuffer[i] : 0x0;

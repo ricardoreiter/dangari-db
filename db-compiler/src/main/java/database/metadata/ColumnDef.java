@@ -59,8 +59,12 @@ public class ColumnDef implements IColumnDef {
 		}
 	}
 
-	private void checkCapacity(Number capacity) {
-		if (capacity.intValue() < 1) {
+	private void checkCapacity(int capacity) {
+		if (dataType == DataType.INTEGER) {
+			return;
+		}
+
+		if (capacity < 1) {
 			throw new RuntimeException("A capacidade da coluna não pode ser menor que 1");
 		}
 	}
