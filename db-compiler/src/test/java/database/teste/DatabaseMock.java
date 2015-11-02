@@ -26,7 +26,7 @@ public class DatabaseMock implements IDatabaseDef {
 
     public DatabaseMock() {
         ITableDef table = createTable("usuario");
-        IColumnDef column = createColumnDef("cod", DataType.NUMBER, 100);
+        IColumnDef column = createColumnDef("cod", DataType.INTEGER, 100);
         table.addColumnDef(column);
 
         column = createColumnDef("nome", DataType.VARCHAR, 100);
@@ -36,7 +36,7 @@ public class DatabaseMock implements IDatabaseDef {
         table.addColumnDef(column);
 
         table = createTable("empresa");
-        column = createColumnDef("cod", DataType.NUMBER, 100);
+        column = createColumnDef("cod", DataType.INTEGER, 100);
         table.addColumnDef(column);
 
         column = createColumnDef("nome", DataType.VARCHAR, 100);
@@ -64,7 +64,7 @@ public class DatabaseMock implements IDatabaseDef {
     }
 
     @Override
-    public IColumnDef createColumnDef(String name, DataType dataType, Number maxValue) {
+    public IColumnDef createColumnDef(String name, DataType dataType, int maxValue) {
         return new ColumnDef(name, dataType, maxValue);
     }
 

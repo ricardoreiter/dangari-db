@@ -2,19 +2,10 @@ package database.metadata;
 
 public enum DataType {
 
-	CHAR(Character.class),
+	CHAR,
 
-	VARCHAR(String.class),
+	VARCHAR,
 
-	NUMBER(Number.class);
+	INTEGER;
 
-	private Class<?> clazz;
-
-	private DataType(Class<?> clazz) {
-		this.clazz = clazz;
-	}
-
-	public Class<?> getClazz() {
-		return clazz;
-	}
 }

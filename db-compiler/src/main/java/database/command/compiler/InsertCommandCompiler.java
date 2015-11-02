@@ -40,7 +40,7 @@ public class InsertCommandCompiler implements ICommandCompiler {
             case 10:
                 InsertValue value = new InsertValue();
                 value.value = token.getLexeme().replace("\"", "");
-                value.type = CompilerDataType.NUMBER;
+                value.type = CompilerDataType.INTEGER;
                 values.add(value);
                 break;
             case 11:
@@ -98,7 +98,7 @@ public class InsertCommandCompiler implements ICommandCompiler {
             }
 
             if (compilerDataType == CompilerDataType.LITERAL) {
-                int columnCapacity = columnDef.getCapacity().intValue();
+                int columnCapacity = columnDef.getCapacity();
                 int literalSize = insertValue.value.length();
                 if (columnDef.getDataType() == DataType.CHAR) {
                     if (columnCapacity != literalSize) {

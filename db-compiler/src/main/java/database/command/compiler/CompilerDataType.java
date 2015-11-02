@@ -15,7 +15,7 @@ import database.metadata.DataType;
  */
 public enum CompilerDataType {
 
-    NUMBER(DataType.NUMBER), LITERAL(DataType.CHAR, DataType.VARCHAR), NULL(DataType.NUMBER, DataType.CHAR, DataType.VARCHAR), FIELD();
+	INTEGER(DataType.INTEGER), LITERAL(DataType.CHAR, DataType.VARCHAR), NULL(DataType.INTEGER, DataType.CHAR, DataType.VARCHAR), FIELD();
 
     private List<DataType> dataTypes;
 

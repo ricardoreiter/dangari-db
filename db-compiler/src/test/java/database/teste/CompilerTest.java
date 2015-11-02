@@ -186,7 +186,7 @@ public class CompilerTest {
             List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = empresa.nome;");
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
-            Assert.assertEquals("Tipos incompatíveis, NUMBER e VARCHAR", e.getMessage());
+            Assert.assertEquals("Tipos incompatíveis, INTEGER e VARCHAR", e.getMessage());
         }
     }
 
@@ -196,7 +196,7 @@ public class CompilerTest {
             List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = usuario.nome;");
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
-            Assert.assertEquals("Tipos incompatíveis, NUMBER e VARCHAR", e.getMessage());
+            Assert.assertEquals("Tipos incompatíveis, INTEGER e VARCHAR", e.getMessage());
         }
     }
 
@@ -226,7 +226,7 @@ public class CompilerTest {
             List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = \"teste\";");
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
-            Assert.assertEquals("Tipos incompatíveis, NUMBER e LITERAL", e.getMessage());
+            Assert.assertEquals("Tipos incompatíveis, INTEGER e LITERAL", e.getMessage());
         }
     }
 
@@ -236,7 +236,7 @@ public class CompilerTest {
             List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = \"teste\";");
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
-            Assert.assertEquals("Tipos incompatíveis, NUMBER e LITERAL", e.getMessage());
+            Assert.assertEquals("Tipos incompatíveis, INTEGER e LITERAL", e.getMessage());
         }
     }
 
@@ -306,7 +306,7 @@ public class CompilerTest {
             List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, cod) VALUES (NULL, \"Teste\");");
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
-            Assert.assertEquals("Tipo [LITERAL] incompatível com o campo [cod]. Era esperado um [NUMBER]", e.getMessage());
+            Assert.assertEquals("Tipo [LITERAL] incompatível com o campo [cod]. Era esperado um [INTEGER]", e.getMessage());
         }
     }
 
@@ -316,7 +316,7 @@ public class CompilerTest {
             List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, cod) VALUES (1, \"Teste\");");
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
-            Assert.assertEquals("Tipo [NUMBER] incompatível com o campo [nome]. Era esperado um [VARCHAR]", e.getMessage());
+            Assert.assertEquals("Tipo [INTEGER] incompatível com o campo [nome]. Era esperado um [VARCHAR]", e.getMessage());
         }
     }
 
@@ -356,7 +356,7 @@ public class CompilerTest {
             List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (caractere, cod) VALUES (1, 1);");
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
-            Assert.assertEquals("Tipo [NUMBER] incompatível com o campo [caractere]. Era esperado um [CHAR]", e.getMessage());
+            Assert.assertEquals("Tipo [INTEGER] incompatível com o campo [caractere]. Era esperado um [CHAR]", e.getMessage());
         }
     }
 

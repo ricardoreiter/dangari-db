@@ -35,7 +35,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
         System.out.println("SELECT_COMMAND_COMPILER - Ação #" + action + ", Token: " + token);
         switch (action) {
             case 10:
-                whereConditions.getLast().dataType = CompilerDataType.NUMBER;
+                whereConditions.getLast().dataType = CompilerDataType.INTEGER;
                 whereConditions.getLast().right = new LinkedList<>();
                 whereConditions.getLast().right.add(token.getLexeme());
                 break;
