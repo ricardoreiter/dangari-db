@@ -7,48 +7,47 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 
-import database.metadata.ColumnDef;
+import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.ITableDef;
 
 public class JoinUtils {
 
-    public static void runRegistryComparators(IRegistry registry, List<AbstractValueComparator> comparators, boolean[] results) {
+    private static void runRegistryComparators(IRegistry registry, List<AbstractValueComparator> comparators, boolean[] results) {
 
         for (AbstractValueComparator comparator : comparators) {
             boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft));
             results[comparator.order] = result;
         }
     }
-    
+
     private static void runJoinComparators(IRegistry registry, HashMap<ITableDef, List<AbstractValueComparator>> joinConditions, boolean[] results) {
-    	for(Entry<ITableDef, List<AbstractValueComparator>> entry : joinConditions.entrySet()) {
-    		for (AbstractValueComparator comparator : entry.getValue()) {
-    			if (registry.columnValue.containsKey(comparator.columnLeft) && registry.columnValue.containsKey(comparator.columnRight)) {
-    				boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
-    				results[comparator.order] = result;
-    			}
-    		}
-    	}
+        for (Entry<ITableDef, List<AbstractValueComparator>> entry : joinConditions.entrySet()) {
+            for (AbstractValueComparator comparator : entry.getValue()) {
+                if (registry.columnValue.containsKey(comparator.columnLeft) && registry.columnValue.containsKey(comparator.columnRight)) {
+                    boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
+                    results[comparator.order] = result;
+                }
+            }
+        }
     }
 
     public static class IRegistry {
 
-        Map<ColumnDef, Object> columnValue = new HashMap<ColumnDef, Object>();
-        
+        public Map<IColumnDef, Object> columnValue = new HashMap<IColumnDef, Object>();
+
         public void mergeWith(IRegistry registryToMerge) {
-        	this.columnValue.putAll(registryToMerge.columnValue);
+            this.columnValue.putAll(registryToMerge.columnValue);
         }
 
     }
 
     public static class TableJoinRegistry implements Comparable<TableJoinRegistry> {
 
-        List<IRegistry> registrys = new LinkedList<JoinUtils.IRegistry>();
-        ITableDef tableDef;
-        List<AbstractValueComparator> tableComparators = new ArrayList<>();
-        HashMap<ITableDef, List<AbstractValueComparator>> joinConditions = new HashMap<>();
+        public List<IRegistry> registrys = new LinkedList<JoinUtils.IRegistry>();
+        public ITableDef tableDef;
+        public List<AbstractValueComparator> tableComparators = new ArrayList<>();
+        public HashMap<ITableDef, List<AbstractValueComparator>> joinConditions = new HashMap<>();
 
         @Override
         public int compareTo(TableJoinRegistry o) {
@@ -69,48 +68,48 @@ public class JoinUtils {
         boolean[] comparatorsResult = new boolean[logicalComparators.size() + 1];
 
         Arrays.sort(registries);
-        Queue<TableJoinRegistry> tableQueue = new LinkedList<JoinUtils.TableJoinRegistry>(Arrays.asList(registries));
-        result.addAll(checkTable(logicalComparators, tableQueue.poll(), tableQueue, comparatorsResult, new IRegistry()));
-        
+        result.addAll(checkTable(logicalComparators, 0, registries, comparatorsResult, new IRegistry()));
+
         return result;
     }
-    
-    private static List<IRegistry> checkTable(ArrayList<AbstractBooleanComparator> logicalComparators, TableJoinRegistry table, Queue<TableJoinRegistry> tableQueue, boolean[] comparatorsResult, IRegistry actualMergedRegistry) {
-    	for (IRegistry actualRegistry : table.registrys) {
-    		actualMergedRegistry.mergeWith(actualRegistry);
-    		
-            runRegistryComparators(actualRegistry, table.tableComparators, comparatorsResult);
-            runJoinComparators(actualMergedRegistry, table.joinConditions, comparatorsResult);
-            
-            TableJoinRegistry nextTable = tableQueue.poll();
-            if (tableQueue.isEmpty()) {
-            	return checkLastTable(logicalComparators, nextTable, comparatorsResult, actualMergedRegistry);
-            } else {
-            	return checkTable(logicalComparators, nextTable, tableQueue, comparatorsResult, actualMergedRegistry);
-            }
+
+    private static List<IRegistry> checkTable(ArrayList<AbstractBooleanComparator> logicalComparators, int currentTable, TableJoinRegistry[] tableList, boolean[] comparatorsResult, IRegistry actualMergedRegistry) {
+        if (currentTable == tableList.length - 1) {
+            return checkLastTable(logicalComparators, tableList[currentTable], comparatorsResult, actualMergedRegistry);
         }
-    	return null;
+        List<IRegistry> validRegistrys = new LinkedList<JoinUtils.IRegistry>();
+        for (IRegistry actualRegistry : tableList[currentTable].registrys) {
+            IRegistry newRegistry = new IRegistry();
+            newRegistry.mergeWith(actualRegistry);
+            newRegistry.mergeWith(actualMergedRegistry);
+            boolean[] actualComparatorsResult = Arrays.copyOf(comparatorsResult, comparatorsResult.length);
+
+            runRegistryComparators(actualRegistry, tableList[currentTable].tableComparators, actualComparatorsResult);
+            runJoinComparators(newRegistry, tableList[currentTable].joinConditions, actualComparatorsResult);
+
+            validRegistrys.addAll(checkTable(logicalComparators, currentTable + 1, tableList, actualComparatorsResult, newRegistry));
+        }
+        return validRegistrys;
     }
 
     private static List<IRegistry> checkLastTable(ArrayList<AbstractBooleanComparator> logicalComparators, TableJoinRegistry table, boolean[] comparatorsResult, IRegistry actualMergedRegistry) {
-    	List<IRegistry> validRegistrys = new LinkedList<JoinUtils.IRegistry>();
-    	for (IRegistry actualRegistry : table.registrys) {
-    		boolean[] actualComparatorsResult = Arrays.copyOf(comparatorsResult, comparatorsResult.length);
+        List<IRegistry> validRegistrys = new LinkedList<JoinUtils.IRegistry>();
+        for (IRegistry actualRegistry : table.registrys) {
+            IRegistry newRegistry = new IRegistry();
+            newRegistry.mergeWith(actualRegistry);
+            newRegistry.mergeWith(actualMergedRegistry);
+            boolean[] actualComparatorsResult = Arrays.copyOf(comparatorsResult, comparatorsResult.length);
             runRegistryComparators(actualRegistry, table.tableComparators, actualComparatorsResult);
 
-            runJoinComparators(actualMergedRegistry, table.joinConditions, actualComparatorsResult);
-            
+            runJoinComparators(newRegistry, table.joinConditions, actualComparatorsResult);
+
             if (isTrue(logicalComparators, actualComparatorsResult)) {
-            	IRegistry newValidRegistry = new IRegistry();
-            	newValidRegistry.mergeWith(actualRegistry);
-            	newValidRegistry.mergeWith(actualMergedRegistry);
-            	
-            	validRegistrys.add(actualMergedRegistry);
+                validRegistrys.add(newRegistry);
             }
         }
-    	return validRegistrys;
+        return validRegistrys;
     }
-    
+
     private static boolean isTrue(ArrayList<AbstractBooleanComparator> conditions, boolean[] values) {
         if (conditions.size() != values.length - 1) {
             throw new IllegalArgumentException("É necessário passra uma lista de comparadores que seja do tamanho da lista de valores - 1");

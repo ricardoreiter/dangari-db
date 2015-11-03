@@ -1,9 +1,15 @@
 package database.utils;
 
+import database.metadata.interfaces.IColumnDef;
+
 public class GreaterValueComparator extends AbstractValueComparator {
 
     public GreaterValueComparator(Object constantValue) {
         super(constantValue);
+    }
+
+    public GreaterValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
+        super(constantValue, columnLeft, columnRight);
     }
 
     @Override

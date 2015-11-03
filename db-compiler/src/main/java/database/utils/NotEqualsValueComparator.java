@@ -1,9 +1,19 @@
 package database.utils;
 
+import database.metadata.interfaces.IColumnDef;
+
 public class NotEqualsValueComparator extends AbstractValueComparator {
 
     public NotEqualsValueComparator(Object constantValue) {
         super(constantValue);
+    }
+
+    public NotEqualsValueComparator(Object constantValue, IColumnDef columnLeft) {
+        super(constantValue, columnLeft);
+    }
+
+    public NotEqualsValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
+        super(constantValue, columnLeft, columnRight);
     }
 
     @Override

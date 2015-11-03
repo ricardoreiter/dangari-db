@@ -17,6 +17,17 @@ public abstract class AbstractValueComparator {
         this.constantValue = constantValue;
     }
 
+    public AbstractValueComparator(Object constantValue, IColumnDef columnLeft) {
+        this.constantValue = constantValue;
+        this.columnLeft = columnLeft;
+    }
+
+    public AbstractValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
+        this.constantValue = constantValue;
+        this.columnLeft = columnLeft;
+        this.columnRight = columnRight;
+    }
+
     public void setOrder(int order) {
         this.order = order;
     }
