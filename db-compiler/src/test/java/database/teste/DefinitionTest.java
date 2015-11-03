@@ -32,7 +32,7 @@ public class DefinitionTest {
 	}
 
 	@Test
-	public void setAndGetTableDef() {
+	public void setAndGetTableDefTest() {
 		ITableDef tableDef = new TableDef("TABLE_TEST");
 
 		tableDef.incrementRowsCount();
