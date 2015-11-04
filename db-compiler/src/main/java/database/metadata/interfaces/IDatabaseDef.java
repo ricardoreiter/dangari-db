@@ -5,6 +5,8 @@
  */
 package database.metadata.interfaces;
 
+import java.util.Map;
+
 import database.metadata.DataType;
 
 /**
@@ -19,5 +21,7 @@ public interface IDatabaseDef {
     ITableDef createTable(String name, IColumnDef... columnsDeff);
 
     IColumnDef createColumnDef(String name, DataType dataType, int capacity);
+
+    Map<String, ITableDef> getTables();
 
 }

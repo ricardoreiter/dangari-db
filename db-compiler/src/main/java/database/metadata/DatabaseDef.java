@@ -6,7 +6,7 @@
 package database.metadata;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import database.metadata.interfaces.IColumnDef;
@@ -21,36 +21,48 @@ import database.storage.DatabaseStorage;
  */
 public class DatabaseDef implements IDatabaseDef {
 
-	private Map<ITableDef, File> tables = new HashMap<>();
+    private Map<ITableDef, File> tables = new LinkedHashMap<>();
+    private Map<String, ITableDef> tablesByName = new LinkedHashMap<>();
 
-	@Override
-	public ITableDef getTableDef(String tableName) {
-		return null;
-	}
+    @Override
+    public ITableDef getTableDef(String tableName) {
+        return tablesByName.get(tableName);
+    }
 
-	@Override
-	public ITableDef createTable(String name) {
-		return null;
-	}
+    @Override
+    public ITableDef createTable(String name) {
+        return createTable(name, new IColumnDef[0]);
+    }
 
-	@Override
-	public ITableDef createTable(String name, IColumnDef... columnsDeff) {
-		return null;
-	}
+    @Override
+    public ITableDef createTable(String name, IColumnDef... columnsDef) {
+        TableDef tableDef = new TableDef(name, columnsDef);
+        return tableDef;
+    }
 
-	@Override
-	public IColumnDef createColumnDef(String name, DataType dataType, int maxValue) {
-		return null;
-	}
+    @Override
+    public IColumnDef createColumnDef(String name, DataType dataType, int capacity) {
+        return new ColumnDef(name, dataType, capacity);
+    }
 
-	public void insert(ITableDef tableDef, Map<IColumnDef, Object> values) {
-		File file = tables.get(tableDef);
+    public void addTable(ITableDef tableDef, File tableFile) {
+        tables.put(tableDef, tableFile);
+        tablesByName.put(tableDef.getName(), tableDef);
+    }
 
-		if (file == null) {
-			throw new RuntimeException(String.format("Não foi encontrada a tabela %s", tableDef.getName()));
-		}
+    public void insert(ITableDef tableDef, Map<IColumnDef, Object> values) {
+        File file = tables.get(tableDef);
 
-		DatabaseStorage.insertRecord(file, tableDef, values);
-	}
+        if (file == null) {
+            throw new RuntimeException(String.format("Não foi encontrada a tabela %s", tableDef.getName()));
+        }
+
+        DatabaseStorage.insertRecord(file, tableDef, values);
+    }
+
+    @Override
+    public Map<String, ITableDef> getTables() {
+        return tablesByName;
+    }
 
 }

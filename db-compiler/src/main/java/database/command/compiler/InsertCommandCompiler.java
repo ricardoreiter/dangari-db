@@ -70,7 +70,7 @@ public class InsertCommandCompiler implements ICommandCompiler {
 
     @Override
     public ICommandExecutor compile() throws SemanticError {
-        IDatabaseDef database = DatabaseManager.INSTANCE.getDatabase();
+        IDatabaseDef database = DatabaseManager.INSTANCE.getActualDatabase();
         ITableDef tableDef = database.getTableDef(table);
         if (tableDef == null) {
             throw new SemanticError("Tabela [" + table + "] não existe");

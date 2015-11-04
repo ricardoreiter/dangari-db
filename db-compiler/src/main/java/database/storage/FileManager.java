@@ -11,132 +11,135 @@ import database.utils.Fn;
 
 public class FileManager {
 
-	private static final String ROOT_DIR = System.getProperty("java.io.tmpdir") + "DANGARI";
-	private static final File ROOT = new File(ROOT_DIR);
-	private static final Map<String, File> databases = new HashMap<>();
+    private static final String ROOT_DIR = System.getProperty("java.io.tmpdir") + "DANGARI";
+    private static final File ROOT = new File(ROOT_DIR);
+    private static final Map<String, File> databases = new HashMap<>();
 
-	static {
-		if (!ROOT.exists()) {
-			ROOT.mkdirs();
-		} else {
-			File[] listFiles = ROOT.listFiles();
-			Fn.apply(db -> databases.put(db.getName(), db), listFiles);
-		}
-	}
+    static {
+        if (!ROOT.exists()) {
+            ROOT.mkdirs();
+        } else {
+            File[] listFiles = ROOT.listFiles();
+            Fn.apply(db -> databases.put(db.getName(), db), listFiles);
+        }
+    }
 
-	public static File getDatabase(String name) {
-		return databases.get(name);
-	}
+    public static Map<String, File> getDatabases() {
+        return databases;
+    }
 
-	public static void deleteDatabase(String database) {
-		checkDatabase(database);
-		File databaseFile = databases.get(database);
+    public static File getDatabase(String name) {
+        return databases.get(name);
+    }
 
-		if (!delete(databaseFile)) {
-			throw new RuntimeException(String.format("Não foi possível deletar a base de dados %s", database));
-		}
+    public static void deleteDatabase(String database) {
+        checkDatabase(database);
+        File databaseFile = databases.get(database);
 
-		databases.remove(database);
-	}
+        if (!delete(databaseFile)) {
+            throw new RuntimeException(String.format("Não foi possível deletar a base de dados %s", database));
+        }
 
-	private static boolean delete(File file) {
-		File[] listFiles = file.listFiles();
+        databases.remove(database);
+    }
 
-		for (File inner : listFiles) {
-			if (inner.isDirectory()) {
-				if (!delete(inner)) {
-					return false;
-				}
-			} else {
-				if (!inner.delete()) {
-					return false;
-				}
-			}
-		}
+    private static boolean delete(File file) {
+        File[] listFiles = file.listFiles();
 
-		return file.delete();
-	}
+        for (File inner : listFiles) {
+            if (inner.isDirectory()) {
+                if (!delete(inner)) {
+                    return false;
+                }
+            } else {
+                if (!inner.delete()) {
+                    return false;
+                }
+            }
+        }
 
-	public static File createDatabase(String name) {
-		if (databases.containsKey(name)) {
-			throw new RuntimeException(String.format("Já existe uma base de dados com o nome %s", name));
-		}
+        return file.delete();
+    }
 
-		String databasePath = ROOT.getAbsolutePath();
+    public static File createDatabase(String name) {
+        if (databases.containsKey(name)) {
+            throw new RuntimeException(String.format("Já existe uma base de dados com o nome %s", name));
+        }
 
-		File databaseFile = new File(String.format("%s%s%s", databasePath, File.separator, name));
+        String databasePath = ROOT.getAbsolutePath();
 
-		if (!databaseFile.mkdirs()) {
-			throw new RuntimeException(String.format("Erro ao criar a base de dados %s", name));
-		}
+        File databaseFile = new File(String.format("%s%s%s", databasePath, File.separator, name));
 
-		databases.put(name, databaseFile);
+        if (!databaseFile.mkdirs()) {
+            throw new RuntimeException(String.format("Erro ao criar a base de dados %s", name));
+        }
 
-		return databaseFile;
-	}
+        databases.put(name, databaseFile);
 
-	public static File[] getTablesBy(String databaseName) {
-		checkDatabase(databaseName);
+        return databaseFile;
+    }
 
-		File databaseFile = databases.get(databaseName);
+    public static File[] getTablesBy(String databaseName) {
+        checkDatabase(databaseName);
 
-		return getTablesBy(databaseFile);
-	}
+        File databaseFile = databases.get(databaseName);
 
-	public static File[] getTablesBy(File database) {
-		File[] files = database.listFiles();
+        return getTablesBy(databaseFile);
+    }
 
-		List<File> lst = new ArrayList<>();
-		for (File file : files) {
-			if (file != null && file.isDirectory()) {
-				lst.add(file);
-			}
-		}
+    public static File[] getTablesBy(File database) {
+        File[] files = database.listFiles();
 
-		return lst.toArray(new File[lst.size()]);
-	}
+        List<File> lst = new ArrayList<>();
+        for (File file : files) {
+            if (file != null && file.isDirectory()) {
+                lst.add(file);
+            }
+        }
 
-	public static File createTable(String databaseName, String tableName) {
-		checkDatabase(databaseName);
+        return lst.toArray(new File[lst.size()]);
+    }
 
-		File database = databases.get(databaseName);
+    public static File createTable(String databaseName, String tableName) {
+        checkDatabase(databaseName);
 
-		String databasePath = database.getAbsolutePath();
+        File database = databases.get(databaseName);
 
-		File tableDir = new File(databasePath + File.separator + tableName);
+        String databasePath = database.getAbsolutePath();
 
-		if (!tableDir.mkdirs()) {
-			throw new RuntimeException(
-					String.format("Não foi possível criar o diretório %s", tableDir.getAbsolutePath()));
-		}
+        File tableDir = new File(databasePath + File.separator + tableName);
 
-		String tablePath = tableDir.getAbsolutePath();
+        if (!tableDir.mkdirs()) {
+            throw new RuntimeException(String.format("Não foi possível criar o diretório %s", tableDir.getAbsolutePath()));
+        }
 
-		persistFile(String.format("%s%s%s%s", tablePath, File.separator, tableName, ".def"));
+        String tablePath = tableDir.getAbsolutePath();
 
-		persistFile(String.format("%s%s%s%s", tablePath, File.separator, tableName, ".dat"));
+        persistFile(String.format("%s%s%s%s", tablePath, File.separator, tableName, ".def"));
 
-		return tableDir;
-	}
+        persistFile(String.format("%s%s%s%s", tablePath, File.separator, tableName, ".dat"));
 
-	private static void persistFile(String pathFile) {
-		File file = new File(pathFile);
-		if (file.exists()) {
-			throw new RuntimeException(String.format("Já arquivo %s já existe.", pathFile));
-		}
+        return tableDir;
+    }
 
-		try {
-			if (!file.createNewFile()) {
-				throw new RuntimeException(String.format("Não foi possível criar o arquivo %s", pathFile));
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private static void persistFile(String pathFile) {
+        File file = new File(pathFile);
+        if (file.exists()) {
+            throw new RuntimeException(String.format("Já arquivo %s já existe.", pathFile));
+        }
 
-	private static void checkDatabase(String database) {
-		if (!databases.containsKey(database)) {
-			throw new RuntimeException(String.format("A base de dados %s não existe", database));
-		}
-	}
+        try {
+            if (!file.createNewFile()) {
+                throw new RuntimeException(String.format("Não foi possível criar o arquivo %s", pathFile));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void checkDatabase(String database) {
+        if (!databases.containsKey(database)) {
+            throw new RuntimeException(String.format("A base de dados %s não existe", database));
+        }
+    }
 }

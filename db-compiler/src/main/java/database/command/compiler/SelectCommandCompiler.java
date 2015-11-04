@@ -105,7 +105,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
 
     @Override
     public ICommandExecutor compile() throws SemanticError {
-        IDatabaseDef database = DatabaseManager.getInstance().getDatabase();
+        IDatabaseDef database = DatabaseManager.getInstance().getActualDatabase();
 
         System.out.println("-- Conferindo campos selecionados --");
         ArrayList<String> checkedFields = new ArrayList<String>(selectedFields.size());

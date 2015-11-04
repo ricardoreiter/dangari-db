@@ -68,4 +68,9 @@ public class DatabaseMock implements IDatabaseDef {
         return new ColumnDef(name, dataType, maxValue);
     }
 
+    @Override
+    public Map<String, ITableDef> getTables() {
+        return null;
+    }
+
 }
