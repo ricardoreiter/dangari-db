@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import database.command.ICommandExecutor;
+import database.command.compiler.AlterDatabaseCommandCompiler;
 import database.command.compiler.CreateTableCommandCompiler;
 import database.command.compiler.ICommandCompiler;
 import database.command.compiler.InsertCommandCompiler;
@@ -26,14 +27,23 @@ public class Semantico implements Constants {
                 break;
             case 20:
                 compiler = new CreateTableCommandCompiler();
+                compiler.accept(action, token);
+                break;
             case 30:
                 if (compiler == null) {
                     compiler = new InsertCommandCompiler();
                 }
+                compiler.accept(action, token);
+                break;
             case 40: // Início de reconhecimento do select
                 if (compiler == null) {
                     compiler = new SelectCommandCompiler();
                 }
+                compiler.accept(action, token);
+                break;
+            case 63: 
+            	compiler = new AlterDatabaseCommandCompiler();
+            	compiler.accept(action, token);
             default:
                 if (compiler == null) {
                     throw new SemanticError("Erro, compilador interno ainda não foi iniciado...");

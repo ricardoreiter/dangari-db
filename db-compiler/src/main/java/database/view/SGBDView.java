@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import database.command.ICommandExecutor;
 import database.gals.LexicalError;
 import database.gals.Lexico;
 import database.gals.SemanticError;
@@ -40,9 +42,14 @@ import database.gals.Semantico;
 import database.gals.Sintatico;
 import database.gals.SyntaticError;
 import database.manager.DatabaseManager;
+import database.metadata.ColumnDef;
+import database.metadata.DataType;
+import database.metadata.TableDef;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
+import database.storage.DefStorage;
+import database.storage.FileManager;
 
 public class SGBDView extends JFrame implements ActionListener {
 
@@ -94,14 +101,18 @@ public class SGBDView extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 Lexico lexico = new Lexico(txtSql.getText());
                 Sintatico sintatico = new Sintatico();
+                Semantico semanticAnalyser = new Semantico();
                 try {
-                    sintatico.parse(lexico, new Semantico());
+					sintatico.parse(lexico, semanticAnalyser);
                 } catch (LexicalError e1) {
                     e1.printStackTrace();
                 } catch (SyntaticError e1) {
                     e1.printStackTrace();
                 } catch (SemanticError e1) {
                     e1.printStackTrace();
+                }
+                for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
+                	executor.execute();
                 }
             }
         });
@@ -163,14 +174,14 @@ public class SGBDView extends JFrame implements ActionListener {
      */
     private void refreshDatabaseTree() {
         // Descomente as linhas abaixo para inserir um database de teste em sua máquina
-        //        File databaseFile = FileManager.createDatabase("Database Usuario-Colaborador");
-        //        File usuarioTable = FileManager.createTable("Database Usuario-Colaborador", "Usuario");
-        //        File colaboradorTable = FileManager.createTable("Database Usuario-Colaborador", "Colaborador");
-        //
-        //        ITableDef usuario = new TableDef("Usuario", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("nome", DataType.VARCHAR, 100) });
-        //        ITableDef colaborador = new TableDef("Colaborador", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("codigoUsuario", DataType.INTEGER, 0), new ColumnDef("cargo", DataType.VARCHAR, 100) });
-        //        DefStorage.setTableDef(usuarioTable, usuario);
-        //        DefStorage.setTableDef(colaboradorTable, colaborador);
+//        File databaseFile = FileManager.createDatabase("Database Usuario-Colaborador");
+//        File usuarioTable = FileManager.createTable("Database Usuario-Colaborador", "Usuario");
+//        File colaboradorTable = FileManager.createTable("Database Usuario-Colaborador", "Colaborador");
+//        //
+//        ITableDef usuario = new TableDef("Usuario", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("nome", DataType.VARCHAR, 100) });
+//        ITableDef colaborador = new TableDef("Colaborador", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("codigoUsuario", DataType.INTEGER, 0), new ColumnDef("cargo", DataType.VARCHAR, 100) });
+//        DefStorage.setTableDef(usuarioTable, usuario);
+//        DefStorage.setTableDef(colaboradorTable, colaborador);
 
         ((DefaultMutableTreeNode) treeModel.getRoot()).removeAllChildren();
         Map<String, IDatabaseDef> databases = DatabaseManager.INSTANCE.getDatabases();
@@ -179,7 +190,7 @@ public class SGBDView extends JFrame implements ActionListener {
             for (Entry<String, ITableDef> table : entry.getValue().getTables().entrySet()) {
                 DefaultMutableTreeNode tableNode = addElementOnTree(table.getKey(), databaseNode);
                 for (IColumnDef column : table.getValue().getColumns()) {
-                    addElementOnTree(column.getName(), tableNode);
+                    addElementOnTree(column.getName() + " : " + column.getDataType(), tableNode);
                 }
             }
         }
