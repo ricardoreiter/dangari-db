@@ -3,6 +3,7 @@ package database.teste;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,12 +24,17 @@ public class DefinitionTest {
 	public void setUp() throws IOException {
 
 		table = new File(System.getProperty("java.io.tmpdir") + "TEST" + File.separator + "TESTE.def");
-		if (table.exists()) {
-			table.delete();
-		}
+
 		table.createNewFile();
 
 		defStorage = new DefStorage();
+	}
+
+	@After
+	public void clear() {
+		if (table.exists()) {
+			table.delete();
+		}
 	}
 
 	@Test
@@ -56,18 +62,43 @@ public class DefinitionTest {
 		Assert.assertEquals(tableDefResult.getName(), tableDef.getName());
 		Assert.assertEquals(tableDefResult.getColumnsCount(), tableDef.getColumnsCount());
 		Assert.assertEquals(tableDefResult.getRowsCount(), tableDef.getRowsCount());
-		
+
 		IColumnDef columnDefAResult = tableDefResult.getColumns().get(0);
 		Assert.assertEquals(columnDefAResult.getName(), columnDefA.getName());
 		Assert.assertEquals(columnDefAResult.getCapacity(), columnDefA.getCapacity());
 		Assert.assertEquals(columnDefAResult.getDataType(), columnDefA.getDataType());
-		
+
 		IColumnDef columnDefBResult = tableDefResult.getColumns().get(1);
 		Assert.assertEquals(columnDefBResult.getName(), columnDefB.getName());
 		Assert.assertEquals(columnDefBResult.getCapacity(), columnDefB.getCapacity());
 		Assert.assertEquals(columnDefBResult.getDataType(), columnDefB.getDataType());
-		
+
 		IColumnDef columnDefCResult = tableDefResult.getColumns().get(2);
+		Assert.assertEquals(columnDefCResult.getName(), columnDefC.getName());
+		Assert.assertEquals(columnDefCResult.getCapacity(), columnDefC.getCapacity());
+		Assert.assertEquals(columnDefCResult.getDataType(), columnDefC.getDataType());
+
+		tableDef.incrementRowsCount();
+
+		defStorage.updateRowsCount(table.getParentFile(), tableDef);
+
+		tableDefResult = defStorage.getTableDef(table.getParentFile());
+
+		Assert.assertEquals(tableDefResult.getName(), tableDef.getName());
+		Assert.assertEquals(tableDefResult.getColumnsCount(), tableDef.getColumnsCount());
+		Assert.assertEquals(tableDefResult.getRowsCount(), tableDef.getRowsCount());
+
+		columnDefAResult = tableDefResult.getColumns().get(0);
+		Assert.assertEquals(columnDefAResult.getName(), columnDefA.getName());
+		Assert.assertEquals(columnDefAResult.getCapacity(), columnDefA.getCapacity());
+		Assert.assertEquals(columnDefAResult.getDataType(), columnDefA.getDataType());
+
+		columnDefBResult = tableDefResult.getColumns().get(1);
+		Assert.assertEquals(columnDefBResult.getName(), columnDefB.getName());
+		Assert.assertEquals(columnDefBResult.getCapacity(), columnDefB.getCapacity());
+		Assert.assertEquals(columnDefBResult.getDataType(), columnDefB.getDataType());
+
+		columnDefCResult = tableDefResult.getColumns().get(2);
 		Assert.assertEquals(columnDefCResult.getName(), columnDefC.getName());
 		Assert.assertEquals(columnDefCResult.getCapacity(), columnDefC.getCapacity());
 		Assert.assertEquals(columnDefCResult.getDataType(), columnDefC.getDataType());

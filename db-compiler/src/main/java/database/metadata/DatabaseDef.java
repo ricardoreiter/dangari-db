@@ -43,7 +43,7 @@ public class DatabaseDef implements IDatabaseDef {
 		return null;
 	}
 
-	public void insert(ITableDef tableDef, Map<ColumnDef, Object> values) {
+	public void insert(ITableDef tableDef, Map<IColumnDef, Object> values) {
 		File file = tables.get(tableDef);
 
 		if (file == null) {

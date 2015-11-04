@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.List;
 
 import database.metadata.ColumnDef;
@@ -24,13 +25,13 @@ public class DefStorage {
 	 */
 	private static final int COLUMN_DEF_SIZE = 95;
 
-	public ITableDef getTableDef(File table) {
+	public static ITableDef getTableDef(File table) {
 		File def = getTableDefFile(table);
 
 		return readTableDef(def);
 	}
 
-	public void setTableDef(File table, ITableDef tableDef) {
+	public static void setTableDef(File table, ITableDef tableDef) {
 		File def = getTableDefFile(table);
 
 		byte[] buffer = getTableDefBuffer(tableDef);
@@ -40,10 +41,23 @@ public class DefStorage {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
 	}
 
-	private byte[] getTableDefBuffer(ITableDef tableDef) {
+	public static void updateRowsCount(File table, ITableDef tableDef) {
+		File def = getTableDefFile(table);
+
+		int rowsCount = tableDef.getRowsCount();
+		byte[] byteInt = DataUtils.toByteArray(rowsCount);
+
+		try (RandomAccessFile out = new RandomAccessFile(def, "rw")) {
+			out.seek(90);
+			out.write(byteInt);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static byte[] getTableDefBuffer(ITableDef tableDef) {
 		byte[] buffer = new byte[TABLE_DEF_SIZE];
 
 		String name = tableDef.getName();
@@ -60,7 +74,7 @@ public class DefStorage {
 		return DataUtils.join(buffer, columnsBuffer);
 	}
 
-	private byte[] getColumnsDefBuffer(List<IColumnDef> columnsDef) {
+	private static byte[] getColumnsDefBuffer(List<IColumnDef> columnsDef) {
 		int coulmnsCount = columnsDef.size();
 
 		byte[] buffer = new byte[coulmnsCount * COLUMN_DEF_SIZE];
@@ -84,7 +98,7 @@ public class DefStorage {
 		return buffer;
 	}
 
-	private ITableDef readTableDef(File def) {
+	private static ITableDef readTableDef(File def) {
 
 		byte[] buffer = new byte[TABLE_DEF_SIZE];
 
@@ -105,7 +119,7 @@ public class DefStorage {
 		return tableDef;
 	}
 
-	private IColumnDef[] readColumnDef(File def, int columnsCount) {
+	private static IColumnDef[] readColumnDef(File def, int columnsCount) {
 		int bufferSize = columnsCount * COLUMN_DEF_SIZE;
 		byte[] buffer = new byte[bufferSize];
 
@@ -135,7 +149,7 @@ public class DefStorage {
 		return columnsDef;
 	}
 
-	private File getTableDefFile(File file) {
+	private static File getTableDefFile(File file) {
 		for (File inner : file.listFiles()) {
 			if (inner.getName().endsWith(".def")) {
 				return inner;
