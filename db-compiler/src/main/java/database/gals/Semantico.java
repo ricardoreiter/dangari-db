@@ -5,6 +5,7 @@ import java.util.List;
 
 import database.command.ICommandExecutor;
 import database.command.compiler.AlterDatabaseCommandCompiler;
+import database.command.compiler.CreateDatabaseCommandCompiler;
 import database.command.compiler.CreateTableCommandCompiler;
 import database.command.compiler.ICommandCompiler;
 import database.command.compiler.InsertCommandCompiler;
@@ -24,8 +25,13 @@ public class Semantico implements Constants {
         switch (action) {
             case 70: // Fim de reconhecimento do comando, irá gerar o executor
                 executors.add(compiler.compile());
+                compiler = null;
                 break;
             case 20:
+                compiler = new CreateDatabaseCommandCompiler();
+                compiler.accept(action, token);
+                break;
+            case 21:
                 compiler = new CreateTableCommandCompiler();
                 compiler.accept(action, token);
                 break;
@@ -41,9 +47,9 @@ public class Semantico implements Constants {
                 }
                 compiler.accept(action, token);
                 break;
-            case 63: 
-            	compiler = new AlterDatabaseCommandCompiler();
-            	compiler.accept(action, token);
+            case 63:
+                compiler = new AlterDatabaseCommandCompiler();
+                compiler.accept(action, token);
             default:
                 if (compiler == null) {
                     throw new SemanticError("Erro, compilador interno ainda não foi iniciado...");

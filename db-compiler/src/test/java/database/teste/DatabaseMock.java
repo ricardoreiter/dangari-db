@@ -5,6 +5,7 @@
  */
 package database.teste;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,6 +72,24 @@ public class DatabaseMock implements IDatabaseDef {
     @Override
     public Map<String, ITableDef> getTables() {
         return null;
+    }
+
+    /* (non-Javadoc)
+     * @see database.metadata.interfaces.IDatabaseDef#getName()
+     */
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see database.metadata.interfaces.IDatabaseDef#addTable(database.metadata.interfaces.ITableDef, java.io.File)
+     */
+    @Override
+    public void addTable(ITableDef tableDef, File tableFile) {
+        // TODO Auto-generated method stub
+
     }
 
 }

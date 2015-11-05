@@ -5,6 +5,7 @@
  */
 package database.metadata.interfaces;
 
+import java.io.File;
 import java.util.Map;
 
 import database.metadata.DataType;
@@ -13,6 +14,8 @@ import database.metadata.DataType;
  * @author ricardo.reiter
  */
 public interface IDatabaseDef {
+
+    String getName();
 
     ITableDef getTableDef(String tableName);
 
@@ -23,5 +26,11 @@ public interface IDatabaseDef {
     IColumnDef createColumnDef(String name, DataType dataType, int capacity);
 
     Map<String, ITableDef> getTables();
+
+    /**
+     * @param tableDef
+     * @param tableFile
+     */
+    void addTable(ITableDef tableDef, File tableFile);
 
 }

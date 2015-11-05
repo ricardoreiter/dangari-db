@@ -10,13 +10,11 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,14 +43,10 @@ import database.gals.Sintatico;
 import database.gals.SyntaticError;
 import database.manager.DatabaseManager;
 import database.manager.DatabaseManager.DatabaseManagerListener;
-import database.metadata.ColumnDef;
 import database.metadata.DataType;
-import database.metadata.TableDef;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
-import database.storage.DefStorage;
-import database.storage.FileManager;
 
 public class SGBDView extends JFrame implements ActionListener {
 
@@ -107,7 +101,7 @@ public class SGBDView extends JFrame implements ActionListener {
                 Sintatico sintatico = new Sintatico();
                 Semantico semanticAnalyser = new Semantico();
                 try {
-					sintatico.parse(lexico, semanticAnalyser);
+                    sintatico.parse(lexico, semanticAnalyser);
                 } catch (LexicalError e1) {
                     e1.printStackTrace();
                 } catch (SyntaticError e1) {
@@ -116,7 +110,7 @@ public class SGBDView extends JFrame implements ActionListener {
                     e1.printStackTrace();
                 }
                 for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
-                	executor.execute();
+                    executor.execute();
                 }
             }
         });
@@ -155,15 +149,15 @@ public class SGBDView extends JFrame implements ActionListener {
         menuBar.add(painelCentro);
 
         refreshDatabaseTree();
-        
+
         DatabaseManager.INSTANCE.setListener(new DatabaseManagerListener() {
-			
-			@Override
-			public void onRefreshDatabases() {
-				refreshDatabaseTree();
-				
-			}
-		});
+
+            @Override
+            public void onRefreshDatabases() {
+                refreshDatabaseTree();
+
+            }
+        });
 
         principal.add(menuBar, BorderLayout.NORTH);
         principal.add(splitHorizontal, BorderLayout.CENTER);
@@ -187,30 +181,31 @@ public class SGBDView extends JFrame implements ActionListener {
      */
     private void refreshDatabaseTree() {
         // Descomente as linhas abaixo para inserir um database de teste em sua máquina
-//        File databaseFile = FileManager.createDatabase("Database2");
-//        File usuarioTable = FileManager.createTable("Database2", "Usuario");
-//        File colaboradorTable = FileManager.createTable("Database2", "Colaborador");
-//        //
-//        ITableDef usuario = new TableDef("Usuario", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("nome", DataType.VARCHAR, 100) });
-//        ITableDef colaborador = new TableDef("Colaborador", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("codigoUsuario", DataType.INTEGER, 0), new ColumnDef("cargo", DataType.VARCHAR, 100) });
-//        DefStorage.setTableDef(usuarioTable, usuario);
-//        DefStorage.setTableDef(colaboradorTable, colaborador);
+        //        File databaseFile = FileManager.createDatabase("Database3");
+        //        File usuarioTable = FileManager.createTable("Database3", "Usuario");
+        //        File colaboradorTable = FileManager.createTable("Database3", "Colaborador");
+        //        //
+        //        ITableDef usuario = new TableDef("Usuario", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("nome", DataType.VARCHAR, 100), new ColumnDef("cpf", DataType.CHAR, 8) });
+        //        ITableDef colaborador = new TableDef("Colaborador", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("codigoUsuario", DataType.INTEGER, 0), new ColumnDef("cargo", DataType.VARCHAR, 100) });
+        //        DefStorage.setTableDef(usuarioTable, usuario);
+        //        DefStorage.setTableDef(colaboradorTable, colaborador);
 
         ((DefaultMutableTreeNode) treeModel.getRoot()).removeAllChildren();
         Map<String, IDatabaseDef> databases = DatabaseManager.INSTANCE.getDatabases();
         for (Entry<String, IDatabaseDef> entry : databases.entrySet()) {
-        	String treeText = entry.getKey();
+            String treeText = entry.getKey();
             if (DatabaseManager.INSTANCE.getActualDatabase() == entry.getValue()) {
-            	treeText += " (ATIVO)";
+                treeText += " (ATIVO)";
             }
             DefaultMutableTreeNode databaseNode = addElementOnRoot(treeText, true);
             for (Entry<String, ITableDef> table : entry.getValue().getTables().entrySet()) {
                 DefaultMutableTreeNode tableNode = addElementOnTree(table.getKey(), databaseNode);
                 for (IColumnDef column : table.getValue().getColumns()) {
-                    addElementOnTree(column.getName() + " : " + column.getDataType(), tableNode);
+                    addElementOnTree(column.getName() + " : " + column.getDataType() + (column.getDataType() != DataType.INTEGER ? "(" + column.getCapacity() + ")" : ""), tableNode);
                 }
             }
         }
+        treeModel.nodeStructureChanged((DefaultMutableTreeNode) treeModel.getRoot());
     }
 
     private void addDadosFakes() {
@@ -294,16 +289,14 @@ public class SGBDView extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
     }
-    
+
     private class DatabaseTreeCustomRenderer extends DefaultTreeCellRenderer {
 
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value,
-            boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
-            super.getTreeCellRendererComponent(
-                tree, value, sel, exp, leaf, row, hasFocus);
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(tree, value, sel, exp, leaf, row, hasFocus);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (!leaf && ((String) node.getUserObject()).endsWith("(ATIVO)")) {
+            if (((String) node.getUserObject()).endsWith("(ATIVO)")) {
                 setForeground(Color.GREEN);
             }
             return this;

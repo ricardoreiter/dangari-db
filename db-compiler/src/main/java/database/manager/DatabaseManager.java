@@ -11,10 +11,11 @@ import database.storage.FileManager;
 
 public final class DatabaseManager {
 
-	public interface DatabaseManagerListener {
-		void onRefreshDatabases();
-	}
-	
+    public interface DatabaseManagerListener {
+
+        void onRefreshDatabases();
+    }
+
     public final static DatabaseManager INSTANCE = new DatabaseManager();
 
     private Map<String, IDatabaseDef> databases = new HashMap<>();
@@ -24,7 +25,7 @@ public final class DatabaseManager {
     private DatabaseManager() {
         Map<String, File> databaseFiles = FileManager.getDatabases();
         for (String key : databaseFiles.keySet()) {
-            DatabaseDef databaseDef = new DatabaseDef();
+            DatabaseDef databaseDef = new DatabaseDef(key);
             File[] tablesFiles = FileManager.getTablesBy(key);
             for (int i = 0; i < tablesFiles.length; i++) {
                 databaseDef.addTable(DefStorage.getTableDef(tablesFiles[i]), tablesFiles[i]);
@@ -58,9 +59,13 @@ public final class DatabaseManager {
     public IDatabaseDef getActualDatabase() {
         return this.database;
     }
-    
+
     public void setListener(DatabaseManagerListener listener) {
-    	this.listener = listener;
+        this.listener = listener;
+    }
+
+    public void refreshDatabase() {
+        if (listener != null) listener.onRefreshDatabases();
     }
 
 }

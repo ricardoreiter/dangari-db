@@ -21,8 +21,13 @@ import database.storage.DatabaseStorage;
  */
 public class DatabaseDef implements IDatabaseDef {
 
+    private String name;
     private Map<ITableDef, File> tables = new LinkedHashMap<>();
     private Map<String, ITableDef> tablesByName = new LinkedHashMap<>();
+
+    public DatabaseDef(String name) {
+        this.name = name;
+    }
 
     @Override
     public ITableDef getTableDef(String tableName) {
@@ -45,6 +50,7 @@ public class DatabaseDef implements IDatabaseDef {
         return new ColumnDef(name, dataType, capacity);
     }
 
+    @Override
     public void addTable(ITableDef tableDef, File tableFile) {
         tables.put(tableDef, tableFile);
         tablesByName.put(tableDef.getName(), tableDef);
@@ -63,6 +69,14 @@ public class DatabaseDef implements IDatabaseDef {
     @Override
     public Map<String, ITableDef> getTables() {
         return tablesByName;
+    }
+
+    /* (non-Javadoc)
+     * @see database.metadata.interfaces.IDatabaseDef#getName()
+     */
+    @Override
+    public String getName() {
+        return this.name;
     }
 
 }
