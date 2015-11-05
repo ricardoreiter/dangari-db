@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -32,6 +33,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import database.command.ICommandExecutor;
@@ -42,6 +44,7 @@ import database.gals.Semantico;
 import database.gals.Sintatico;
 import database.gals.SyntaticError;
 import database.manager.DatabaseManager;
+import database.manager.DatabaseManager.DatabaseManagerListener;
 import database.metadata.ColumnDef;
 import database.metadata.DataType;
 import database.metadata.TableDef;
@@ -89,6 +92,7 @@ public class SGBDView extends JFrame implements ActionListener {
         final JScrollPane spTop = new JScrollPane(txtSql);
         final JPanel principal = new JPanel(new BorderLayout());
         treeModel = (DefaultTreeModel) jTree.getModel();
+        jTree.setCellRenderer(new DatabaseTreeCustomRenderer());
 
         painelCentroTop.add(spTop, BorderLayout.CENTER);
         final JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -151,6 +155,15 @@ public class SGBDView extends JFrame implements ActionListener {
         menuBar.add(painelCentro);
 
         refreshDatabaseTree();
+        
+        DatabaseManager.INSTANCE.setListener(new DatabaseManagerListener() {
+			
+			@Override
+			public void onRefreshDatabases() {
+				refreshDatabaseTree();
+				
+			}
+		});
 
         principal.add(menuBar, BorderLayout.NORTH);
         principal.add(splitHorizontal, BorderLayout.CENTER);
@@ -174,9 +187,9 @@ public class SGBDView extends JFrame implements ActionListener {
      */
     private void refreshDatabaseTree() {
         // Descomente as linhas abaixo para inserir um database de teste em sua máquina
-//        File databaseFile = FileManager.createDatabase("Database Usuario-Colaborador");
-//        File usuarioTable = FileManager.createTable("Database Usuario-Colaborador", "Usuario");
-//        File colaboradorTable = FileManager.createTable("Database Usuario-Colaborador", "Colaborador");
+//        File databaseFile = FileManager.createDatabase("Database2");
+//        File usuarioTable = FileManager.createTable("Database2", "Usuario");
+//        File colaboradorTable = FileManager.createTable("Database2", "Colaborador");
 //        //
 //        ITableDef usuario = new TableDef("Usuario", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("nome", DataType.VARCHAR, 100) });
 //        ITableDef colaborador = new TableDef("Colaborador", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("codigoUsuario", DataType.INTEGER, 0), new ColumnDef("cargo", DataType.VARCHAR, 100) });
@@ -186,7 +199,11 @@ public class SGBDView extends JFrame implements ActionListener {
         ((DefaultMutableTreeNode) treeModel.getRoot()).removeAllChildren();
         Map<String, IDatabaseDef> databases = DatabaseManager.INSTANCE.getDatabases();
         for (Entry<String, IDatabaseDef> entry : databases.entrySet()) {
-            DefaultMutableTreeNode databaseNode = addElementOnRoot(entry.getKey(), true);
+        	String treeText = entry.getKey();
+            if (DatabaseManager.INSTANCE.getActualDatabase() == entry.getValue()) {
+            	treeText += " (ATIVO)";
+            }
+            DefaultMutableTreeNode databaseNode = addElementOnRoot(treeText, true);
             for (Entry<String, ITableDef> table : entry.getValue().getTables().entrySet()) {
                 DefaultMutableTreeNode tableNode = addElementOnTree(table.getKey(), databaseNode);
                 for (IColumnDef column : table.getValue().getColumns()) {
@@ -276,6 +293,21 @@ public class SGBDView extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         // TODO Auto-generated method stub
+    }
+    
+    private class DatabaseTreeCustomRenderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+            boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
+            super.getTreeCellRendererComponent(
+                tree, value, sel, exp, leaf, row, hasFocus);
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            if (!leaf && ((String) node.getUserObject()).endsWith("(ATIVO)")) {
+                setForeground(Color.GREEN);
+            }
+            return this;
+        }
     }
 
 }

@@ -11,10 +11,15 @@ import database.storage.FileManager;
 
 public final class DatabaseManager {
 
+	public interface DatabaseManagerListener {
+		void onRefreshDatabases();
+	}
+	
     public final static DatabaseManager INSTANCE = new DatabaseManager();
 
     private Map<String, IDatabaseDef> databases = new HashMap<>();
     private IDatabaseDef database;
+    private DatabaseManagerListener listener;
 
     private DatabaseManager() {
         Map<String, File> databaseFiles = FileManager.getDatabases();
@@ -34,10 +39,12 @@ public final class DatabaseManager {
 
     public void setDatabase(String databaseName) {
         this.database = getDatabase(databaseName);
+        if (listener != null) listener.onRefreshDatabases();
     }
 
     public void addDatabase(String name, IDatabaseDef database) {
         databases.put(name, database);
+        if (listener != null) listener.onRefreshDatabases();
     }
 
     public IDatabaseDef getDatabase(String name) {
@@ -50,6 +57,10 @@ public final class DatabaseManager {
 
     public IDatabaseDef getActualDatabase() {
         return this.database;
+    }
+    
+    public void setListener(DatabaseManagerListener listener) {
+    	this.listener = listener;
     }
 
 }
