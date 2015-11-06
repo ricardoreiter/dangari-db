@@ -92,4 +92,13 @@ public class DatabaseMock implements IDatabaseDef {
 
     }
 
+    /* (non-Javadoc)
+     * @see database.metadata.interfaces.IDatabaseDef#insert(database.metadata.interfaces.ITableDef, java.util.Map)
+     */
+    @Override
+    public void insert(ITableDef tableDef, Map<IColumnDef, String> values) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

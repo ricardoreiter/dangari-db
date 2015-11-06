@@ -33,4 +33,6 @@ public interface IDatabaseDef {
      */
     void addTable(ITableDef tableDef, File tableFile);
 
+    void insert(ITableDef tableDef, Map<IColumnDef, String> values);
+
 }

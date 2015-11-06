@@ -6,9 +6,12 @@
 package database.command.compiler;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import database.command.ICommandExecutor;
+import database.command.InsertCommandExecutor;
 import database.gals.SemanticError;
 import database.gals.Token;
 import database.manager.DatabaseManager;
@@ -35,7 +38,6 @@ public class InsertCommandCompiler implements ICommandCompiler {
 
     @Override
     public void accept(int action, Token token) {
-        System.out.println("SELECT_COMMAND_COMPILER - Ação #" + action + ", Token: " + token);
         switch (action) {
             case 10:
                 InsertValue value = new InsertValue();
@@ -90,6 +92,7 @@ public class InsertCommandCompiler implements ICommandCompiler {
         }
 
         int i = 0;
+        Map<IColumnDef, String> validValues = new LinkedHashMap<>();
         for (InsertValue insertValue : values) {
             CompilerDataType compilerDataType = insertValue.type;
             IColumnDef columnDef = columns.get(i);
@@ -110,9 +113,10 @@ public class InsertCommandCompiler implements ICommandCompiler {
                     }
                 }
             }
+            validValues.put(columnDef, insertValue.value);
             i++;
         }
-        return null;
+        return new InsertCommandExecutor(tableDef, validValues);
     }
 
 }

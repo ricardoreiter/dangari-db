@@ -56,7 +56,8 @@ public class DatabaseDef implements IDatabaseDef {
         tablesByName.put(tableDef.getName(), tableDef);
     }
 
-    public void insert(ITableDef tableDef, Map<IColumnDef, Object> values) {
+    @Override
+    public void insert(ITableDef tableDef, Map<IColumnDef, String> values) {
         File file = tables.get(tableDef);
 
         if (file == null) {
