@@ -13,7 +13,7 @@ public class CreateDatabaseCommandExecutor implements ICommandExecutor {
     }
 
     @Override
-    public IBuffer[] execute() {
+    public CommandResult execute() {
         FileManager.createDatabase(databaseName);
         DatabaseManager.INSTANCE.addDatabase(databaseName, new DatabaseDef(databaseName));
 

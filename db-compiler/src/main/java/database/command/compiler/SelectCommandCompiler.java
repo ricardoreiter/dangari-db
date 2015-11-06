@@ -107,6 +107,10 @@ public class SelectCommandCompiler implements ICommandCompiler {
     public ICommandExecutor compile() throws SemanticError {
         IDatabaseDef database = DatabaseManager.getInstance().getActualDatabase();
 
+        if (database == null) {
+            throw new SemanticError("Nenhum database ativo. Use [SET DATABASE NOME] para definir um database ativo.");
+        }
+
         System.out.println("-- Conferindo campos selecionados --");
         ArrayList<String> checkedFields = new ArrayList<String>(selectedFields.size());
         for (LinkedList<String> field : selectedFields) {

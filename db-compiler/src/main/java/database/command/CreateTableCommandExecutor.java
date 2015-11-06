@@ -23,7 +23,7 @@ public class CreateTableCommandExecutor implements ICommandExecutor {
     }
 
     @Override
-    public IBuffer[] execute() {
+    public CommandResult execute() {
         IDatabaseDef database = DatabaseManager.INSTANCE.getActualDatabase();
         File tableFile = FileManager.createTable(database.getName(), tableName);
 

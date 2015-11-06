@@ -2,57 +2,59 @@ package database.view;
 
 import javax.swing.table.DefaultTableModel;
 
+import database.command.CommandResult;
+
 public class ResultTableModel extends DefaultTableModel {
 
-	private static final long serialVersionUID = 1L;
-	private final Result result;
+    private static final long serialVersionUID = 1L;
+    private final CommandResult result;
+    private String[] columns;
 
-	public ResultTableModel(Result result) {
-		this.result = result;
-	}
+    public ResultTableModel(CommandResult commandResult) {
+        this.result = commandResult;
+        this.columns = new String[commandResult.getValues().size()];
+        int i = 0;
+        for (String column : commandResult.getValues().keySet()) {
+            columns[i] = column;
+            i++;
+        }
+    }
 
-	@Override
-	public Class<?> getColumnClass(int columnIndex) {
-		return String.class;
-	}
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return String.class;
+    }
 
-	@Override
-	public int getColumnCount() {
-		if (result != null && result.getCols() != null) {
-			return result.getCols().length;
-		}
-		return 0;
-	}
+    @Override
+    public int getColumnCount() {
+        if (result != null && result.getValues() != null) {
+            return columns.length;
+        }
+        return 0;
+    }
 
-	@Override
-	public String getColumnName(int column) {
-		if (result != null && result.getCols() != null) {
-			return result.getCols()[column].getAlias();
-		}
-		return "Nome não definido";
-	}
+    @Override
+    public String getColumnName(int column) {
+        if (result != null && result.getValues() != null) {
+            return columns[column];
+        }
+        return "Nome não definido";
+    }
 
-	public Column getColumn(int column) {
-		if (result != null && result.getCols() != null) {
-			return result.getCols()[column];
-		}
-		return null;
-	}
+    @Override
+    public Object getValueAt(int row, int column) {
+        if (result != null && result.getValues() != null) {
+            return result.getValues().get(columns[column]).get(row);
+        }
+        return super.getValueAt(row, column);
+    }
 
-	@Override
-	public Object getValueAt(int row, int column) {
-		if (result != null && result.getResultMap() != null) {
-			return result.getResultMap().get(getColumn(column)).get(row);
-		}
-		return super.getValueAt(row, column);
-	}
-
-	@Override
-	public int getRowCount() {
-		if (result != null && result.getResultMap() != null) {
-			return result.getResultMap().get(result.getCols()[0]).size();
-		}
-		return super.getRowCount();
-	}
+    @Override
+    public int getRowCount() {
+        if (result != null && result.getValues() != null) {
+            return result.getValues().get(columns[0]).size();
+        }
+        return super.getRowCount();
+    }
 
 }

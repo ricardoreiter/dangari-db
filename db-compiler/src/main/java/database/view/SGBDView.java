@@ -10,8 +10,6 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,6 +32,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
+import database.command.CommandResult;
 import database.command.ICommandExecutor;
 import database.gals.LexicalError;
 import database.gals.Lexico;
@@ -70,14 +69,12 @@ public class SGBDView extends JFrame implements ActionListener {
     private final JButton btnImportar = new JButton();
     private final JButton btnExportar = new JButton();
     private final JButton btnLimpar = new JButton();
-    private final Result result = new Result();
+    private final JTable resultTable = new JTable();
     private JTextArea txtSql;
 
     public SGBDView() {
-        addDadosFakes(); // TODO apagar
-
         final JPanel panelBotton = new JPanel(new BorderLayout());
-        final JScrollPane spBottom = new JScrollPane(new JTable(new ResultTableModel(result)));
+        final JScrollPane spBottom = new JScrollPane(resultTable);
         panelBotton.add(spBottom, BorderLayout.CENTER);
         panelBotton.add(toolBar, BorderLayout.SOUTH);
         final JPanel painelCentroTop = new JPanel(new BorderLayout());
@@ -97,21 +94,25 @@ public class SGBDView extends JFrame implements ActionListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                long initialTime = System.currentTimeMillis();
                 Lexico lexico = new Lexico(txtSql.getText());
                 Sintatico sintatico = new Sintatico();
                 Semantico semanticAnalyser = new Semantico();
+                CommandResult commandResult = new CommandResult();
                 try {
                     sintatico.parse(lexico, semanticAnalyser);
-                } catch (LexicalError e1) {
-                    e1.printStackTrace();
-                } catch (SyntaticError e1) {
-                    e1.printStackTrace();
-                } catch (SemanticError e1) {
-                    e1.printStackTrace();
+                    for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
+                        commandResult = executor.execute();
+                        refreshResultConsole(commandResult);
+                    }
+                } catch (LexicalError | SyntaticError | SemanticError e1) {
+                    commandResult = new CommandResult();
+                    commandResult.addColumn("Erro");
+                    commandResult.addValue("Erro", e1.getMessage());
+                    refreshResultConsole(commandResult);
                 }
-                for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
-                    executor.execute();
-                }
+                long timeTook = System.currentTimeMillis() - initialTime;
+                updateStatusBar(timeTook, commandResult.getValues().entrySet().iterator().next().getValue().size());
             }
         });
 
@@ -136,9 +137,7 @@ public class SGBDView extends JFrame implements ActionListener {
         splitHorizontal.setLeftComponent(jTree);
         splitHorizontal.setRightComponent(splitVertical);
 
-        final JLabel txtInfo = new JLabel("Tempo total: 125             1024 linha(s)");
-        txtInfo.setIcon(new ImageIcon("src/main/java/img/tempoTotal.png")); // TODO trocar para pegar do resource as stream
-        toolBar.add(txtInfo);// TODO fazer update ser um método
+        updateStatusBar(0, 0);
         final JLabel lblEquipe = new JLabel("SGBD DANGARI");
         lblEquipe.setBorder(new LineBorder(Color.BLACK));
         lblEquipe.setHorizontalAlignment(SwingConstants.CENTER);
@@ -179,17 +178,18 @@ public class SGBDView extends JFrame implements ActionListener {
     /**
      * 
      */
-    private void refreshDatabaseTree() {
-        // Descomente as linhas abaixo para inserir um database de teste em sua máquina
-        //        File databaseFile = FileManager.createDatabase("Database3");
-        //        File usuarioTable = FileManager.createTable("Database3", "Usuario");
-        //        File colaboradorTable = FileManager.createTable("Database3", "Colaborador");
-        //        //
-        //        ITableDef usuario = new TableDef("Usuario", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("nome", DataType.VARCHAR, 100), new ColumnDef("cpf", DataType.CHAR, 8) });
-        //        ITableDef colaborador = new TableDef("Colaborador", new IColumnDef[] { new ColumnDef("codigo", DataType.INTEGER, 0), new ColumnDef("codigoUsuario", DataType.INTEGER, 0), new ColumnDef("cargo", DataType.VARCHAR, 100) });
-        //        DefStorage.setTableDef(usuarioTable, usuario);
-        //        DefStorage.setTableDef(colaboradorTable, colaborador);
+    private void updateStatusBar(long timeTook, int lines) {
+        final JLabel txtInfo = new JLabel(String.format("Tempo total: %sms             %s linha(s)", timeTook, lines));
+        txtInfo.setIcon(new ImageIcon("src/main/java/img/tempoTotal.png")); // TODO trocar para pegar do resource as stream
+        toolBar.removeAll();
+        toolBar.add(txtInfo);// TODO fazer update ser um método
+        toolBar.validate();
+    }
 
+    /**
+     * 
+     */
+    private void refreshDatabaseTree() {
         ((DefaultMutableTreeNode) treeModel.getRoot()).removeAllChildren();
         Map<String, IDatabaseDef> databases = DatabaseManager.INSTANCE.getDatabases();
         for (Entry<String, IDatabaseDef> entry : databases.entrySet()) {
@@ -208,53 +208,8 @@ public class SGBDView extends JFrame implements ActionListener {
         treeModel.nodeStructureChanged((DefaultMutableTreeNode) treeModel.getRoot());
     }
 
-    private void addDadosFakes() {
-        final List<String> ids = new ArrayList<String>();
-        ids.add("1");
-        ids.add("2");
-        ids.add("3");
-        ids.add("4");
-        ids.add("5");
-        ids.add("6");
-        ids.add("7");
-        ids.add("1");
-        ids.add("2");
-        ids.add("3");
-        ids.add("4");
-        ids.add("5");
-        ids.add("6");
-        ids.add("7");
-        ids.add("1");
-        ids.add("2");
-        ids.add("3");
-        ids.add("4");
-        ids.add("5");
-        ids.add("6");
-        ids.add("7");
-        final List<String> nomes = new ArrayList<String>();
-        nomes.add("joao");
-        nomes.add("pedro");
-        nomes.add("daniel");
-        nomes.add("gabriel");
-        nomes.add("ricardo");
-        nomes.add("jose");
-        nomes.add("damiao");
-        nomes.add("joao");
-        nomes.add("pedro");
-        nomes.add("daniel");
-        nomes.add("gabriel");
-        nomes.add("ricardo");
-        nomes.add("jose");
-        nomes.add("damiao");
-        nomes.add("joao");
-        nomes.add("pedro");
-        nomes.add("daniel");
-        nomes.add("gabriel");
-        nomes.add("ricardo");
-        nomes.add("jose");
-        nomes.add("damiao");
-        result.addLine(new Column("id"), ids);
-        result.addLine(new Column("nome"), nomes);
+    private void refreshResultConsole(CommandResult commandResult) {
+        resultTable.setModel(new ResultTableModel(commandResult));
     }
 
     /**
