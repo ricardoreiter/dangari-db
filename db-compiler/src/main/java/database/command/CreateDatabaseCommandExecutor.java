@@ -16,8 +16,10 @@ public class CreateDatabaseCommandExecutor implements ICommandExecutor {
     public CommandResult execute() {
         FileManager.createDatabase(databaseName);
         DatabaseManager.INSTANCE.addDatabase(databaseName, new DatabaseDef(databaseName));
-
-        return null;
+        CommandResult commandResult = new CommandResult();
+        commandResult.addColumn("Info");
+        commandResult.addValue("Info", String.format("O database [%s] foi criado com sucesso.", databaseName));
+        return commandResult;
     }
 
 }

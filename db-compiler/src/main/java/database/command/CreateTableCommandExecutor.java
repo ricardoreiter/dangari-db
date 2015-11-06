@@ -38,6 +38,9 @@ public class CreateTableCommandExecutor implements ICommandExecutor {
         database.addTable(tableDef, tableFile);
         DatabaseManager.INSTANCE.refreshDatabase();
 
-        return null;
+        CommandResult commandResult = new CommandResult();
+        commandResult.addColumn("Info");
+        commandResult.addValue("Info", String.format("A tabela [%s] foi criada com sucesso.", tableName));
+        return commandResult;
     }
 }
