@@ -1,8 +1,10 @@
 package database.command.compiler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import database.command.ICommandExecutor;
 import database.command.SelectCommandExecutor;
@@ -12,6 +14,16 @@ import database.manager.DatabaseManager;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
+import database.utils.AbstractBooleanComparator;
+import database.utils.AbstractValueComparator;
+import database.utils.AndBooleanComparator;
+import database.utils.EqualsValueComparator;
+import database.utils.GreaterOrEqualsValueComparator;
+import database.utils.GreaterValueComparator;
+import database.utils.LessOrEqualsValueComparator;
+import database.utils.LessValueComparator;
+import database.utils.NotEqualsValueComparator;
+import database.utils.OrBooleanComparator;
 
 public class SelectCommandCompiler implements ICommandCompiler {
 
@@ -113,26 +125,44 @@ public class SelectCommandCompiler implements ICommandCompiler {
 
         System.out.println("-- Conferindo campos selecionados --");
         ArrayList<String> checkedFields = new ArrayList<String>(selectedFields.size());
+        List<IColumnDef> selectedColumns = new LinkedList<IColumnDef>();
         for (LinkedList<String> field : selectedFields) {
-            checkSelectedField(database, field, checkedFields, true);
+        	selectedColumns.addAll(checkSelectedField(database, field, checkedFields, true));
         }
 
-        System.out.println("-- Conferindo tabelas selecionadas --");
+        List<ITableDef> tables = new LinkedList<ITableDef>();
         for (String table : selectedTables) {
-            checkTable(database, table);
+            tables.add(checkTable(database, table));
         }
 
-        System.out.println("-- Conferindo cláusula where --");
+        HashMap<ITableDef, List<AbstractValueComparator>> tableComparators = new HashMap<ITableDef, List<AbstractValueComparator>>();
+        Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators = new HashMap<ITableDef, HashMap<ITableDef,List<AbstractValueComparator>>>();
         for (WhereCondition whereCondition : whereConditions) {
-            checkWhere(database, whereCondition);
+            checkWhere(database, whereCondition, tableComparators, tableJoinComparators);
         }
 
-        return new SelectCommandExecutor();
+        return new SelectCommandExecutor(tables, getLogicalComparators(), tableComparators, tableJoinComparators, selectedColumns);
+    }
+    
+    private ArrayList<AbstractBooleanComparator> getLogicalComparators() {
+    	ArrayList<AbstractBooleanComparator> result = new ArrayList<AbstractBooleanComparator>();
+    	for (String comparator : whereLogicalConditions) {
+    		switch (comparator.toLowerCase()) {
+			case "and":
+				result.add(new AndBooleanComparator());
+				break;
+			default:
+				result.add(new OrBooleanComparator());
+				break;
+			}
+    	}
+    	return result;
     }
 
-    private IColumnDef checkSelectedField(IDatabaseDef database, LinkedList<String> tableAndField, ArrayList<String> checkedFields, boolean allowAllFields) throws SemanticError {
+    private List<IColumnDef> checkSelectedField(IDatabaseDef database, LinkedList<String> tableAndField, ArrayList<String> checkedFields, boolean allowAllFields) throws SemanticError {
         IColumnDef columnDef = null;
         String tableField;
+        LinkedList<IColumnDef> resultList = new LinkedList<IColumnDef>();
         if (tableAndField.size() > 1) { // Se está estruturado em tabela.coluna
             String table = tableAndField.getFirst();
             String field = tableAndField.getLast();
@@ -147,11 +177,13 @@ public class SelectCommandCompiler implements ICommandCompiler {
                 if (!allowAllFields) {
                     throw new SemanticError("Não é possível utilizar a seleção de todos os campos '*', é necessário especificar um campo");
                 }
+                resultList.addAll(tableDef.getColumns());
             } else {
                 columnDef = tableDef.getColumnDef(field);
                 if (columnDef == null) {
                     throw new SemanticError("Tabela " + table + " não possuí nenhuma coluna " + field);
                 }
+                resultList.add(columnDef);
             }
         } else {
             if (selectedTables.size() > 1) {
@@ -163,6 +195,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
             if (columnDef == null) {
                 throw new SemanticError("Tabela " + selectedTables.get(0) + " não possuí nenhuma coluna " + tableField);
             }
+            resultList.add(columnDef);
         }
 
         if (checkedFields.contains(tableField)) {
@@ -170,8 +203,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
         } else {
             checkedFields.add(tableField);
         }
-
-        return columnDef;
+        return resultList;
     }
 
     private ITableDef checkTable(IDatabaseDef database, String tableName) throws SemanticError {
@@ -182,20 +214,91 @@ public class SelectCommandCompiler implements ICommandCompiler {
         return tableDef;
     }
 
-    private void checkWhere(IDatabaseDef database, WhereCondition whereCondition) throws SemanticError {
+    private AbstractValueComparator getComparator(String operation, IColumnDef columnLeft, IColumnDef columnRight, Object constantValue) {
+    	switch (operation) {
+		case "=":
+			return new EqualsValueComparator(constantValue, columnLeft, columnRight);
+		case "!=":
+			return new NotEqualsValueComparator(constantValue, columnLeft, columnRight);
+		case ">":
+			return new GreaterValueComparator(constantValue, columnLeft, columnRight);
+		case "<":
+			return new LessValueComparator(constantValue, columnLeft, columnRight);
+		case ">=":
+			return new GreaterOrEqualsValueComparator(constantValue, columnLeft, columnRight);
+		case "<=":
+			return new LessOrEqualsValueComparator(constantValue, columnLeft, columnRight);
+		default:
+			return null;
+		}
+    }
+    
+    private void checkWhere(IDatabaseDef database, WhereCondition whereCondition, HashMap<ITableDef, List<AbstractValueComparator>> tableComparators, Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators) throws SemanticError {
         ArrayList<String> checkedFields = new ArrayList<String>();
-        IColumnDef columnDef = checkSelectedField(database, whereCondition.left, checkedFields, false);
+        IColumnDef columnDef = checkSelectedField(database, whereCondition.left, checkedFields, false).get(0);
 
         if (whereCondition.dataType == CompilerDataType.FIELD) {
-            IColumnDef rightColumn = checkSelectedField(database, whereCondition.right, checkedFields, false);
+            IColumnDef rightColumn = checkSelectedField(database, whereCondition.right, checkedFields, false).get(0);
             if (columnDef.getDataType() != rightColumn.getDataType()) {
                 throw new SemanticError("Tipos incompatíveis, " + columnDef.getDataType() + " e " + rightColumn.getDataType());
             }
+            
+            addJoinComparators(database, whereCondition, tableComparators, tableJoinComparators, columnDef, rightColumn);
         } else {
             if (!whereCondition.dataType.getDataTypes().contains(columnDef.getDataType())) {
                 throw new SemanticError("Tipos incompatíveis, " + columnDef.getDataType() + " e " + whereCondition.dataType);
             }
+            
+            addConstantValueComparator(database, whereCondition, tableComparators, columnDef);
         }
     }
+
+	private void addJoinComparators(
+			IDatabaseDef database,
+			WhereCondition whereCondition,
+			HashMap<ITableDef, List<AbstractValueComparator>> tableComparators,
+			Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators,
+			IColumnDef columnDef, IColumnDef rightColumn) {
+		ITableDef tableLeft = database.getTableDef(whereCondition.left.getFirst());
+		ITableDef tableRight = database.getTableDef(whereCondition.right.getFirst());
+		HashMap<ITableDef, List<AbstractValueComparator>> tableLeftJoinComparators;
+		if (tableComparators.containsKey(tableLeft)) {
+			tableLeftJoinComparators = tableJoinComparators.get(tableLeft);
+		} else {
+			tableLeftJoinComparators = new HashMap<ITableDef, List<AbstractValueComparator>>();
+			tableJoinComparators.put(tableLeft, tableLeftJoinComparators);
+		}
+		
+		List<AbstractValueComparator> comparatorsList;
+		if (tableLeftJoinComparators.containsKey(tableRight)) {
+			comparatorsList = tableLeftJoinComparators.get(tableRight);
+		} else {
+			comparatorsList = new LinkedList<AbstractValueComparator>();
+			tableLeftJoinComparators.put(tableRight, comparatorsList);
+		}
+		
+		comparatorsList.add(getComparator(whereCondition.relationalOperation, columnDef, rightColumn, null));
+	}
+
+	private void addConstantValueComparator(IDatabaseDef database,
+			WhereCondition whereCondition,
+			HashMap<ITableDef, List<AbstractValueComparator>> tableComparators,
+			IColumnDef columnDef) {
+		ITableDef tableLeft = database.getTableDef(whereCondition.left.getFirst());
+		List<AbstractValueComparator> list;
+		if (tableComparators.containsKey(tableLeft)) {
+			list = tableComparators.get(tableLeft);
+		} else {
+			list = new LinkedList<AbstractValueComparator>();
+			tableComparators.put(tableLeft, list);
+		}
+		Object constantValue;
+		if (whereCondition.dataType == CompilerDataType.INTEGER) {
+			constantValue = new Integer(whereCondition.right.getFirst());
+		} else {
+			constantValue = whereCondition.right.getFirst();
+		}
+		list.add(getComparator(whereCondition.relationalOperation, columnDef, null, constantValue));
+	}
 
 }

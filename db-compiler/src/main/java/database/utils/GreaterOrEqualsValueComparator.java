@@ -1,11 +1,17 @@
 package database.utils;
 
+import database.metadata.interfaces.IColumnDef;
+
 public class GreaterOrEqualsValueComparator extends AbstractValueComparator {
 
     public GreaterOrEqualsValueComparator(Object constantValue) {
         super(constantValue);
     }
 
+    public GreaterOrEqualsValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
+        super(constantValue, columnLeft, columnRight);
+    }
+    
     @Override
     public boolean isValid(Object valueRight) {
         return ((Comparable<Object>) constantValue).compareTo(valueRight) >= 0;

@@ -7,12 +7,17 @@ package database.metadata;
 
 import java.io.File;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
 import database.storage.DatabaseStorage;
+import database.storage.Result;
+import database.utils.JoinUtils;
+import database.utils.JoinUtils.IRegistry;
 
 /**
  * Esta é a implementação concreta, que terá ligação com o sistema de arquivos
@@ -72,12 +77,28 @@ public class DatabaseDef implements IDatabaseDef {
         return tablesByName;
     }
 
-    /* (non-Javadoc)
-     * @see database.metadata.interfaces.IDatabaseDef#getName()
-     */
     @Override
     public String getName() {
         return this.name;
     }
+
+	@Override
+	public List<IRegistry> getRecords(ITableDef tableDef) {
+		File tableFile = tables.get(tableDef);
+		
+		Result recordsResult = DatabaseStorage.getRecords(tableFile, tableDef);
+		List<IRegistry> listRegistrys = new LinkedList<JoinUtils.IRegistry>();
+        for (int i = 0; i < tableDef.getRowsCount(); i++) {
+        	IRegistry newRegistry = new IRegistry();
+        	
+        	for (IColumnDef column : tableDef.getColumns()) {
+        		newRegistry.columnValue.put(column, recordsResult.getAsObject(column));
+        	}
+        	
+        	listRegistrys.add(newRegistry);
+        	recordsResult.next();
+        }
+		return listRegistrys;
+	}
 
 }

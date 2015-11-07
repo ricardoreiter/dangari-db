@@ -7,6 +7,7 @@ package database.teste;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import database.metadata.ColumnDef;
@@ -15,6 +16,8 @@ import database.metadata.TableDef;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
+import database.storage.Result;
+import database.utils.JoinUtils.IRegistry;
 
 /**
  * Mock para testes do compilador e executor
@@ -100,5 +103,11 @@ public class DatabaseMock implements IDatabaseDef {
         // TODO Auto-generated method stub
 
     }
+
+	@Override
+	public List<IRegistry> getRecords(ITableDef tableDef) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

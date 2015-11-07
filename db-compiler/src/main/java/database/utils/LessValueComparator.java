@@ -1,9 +1,15 @@
 package database.utils;
 
+import database.metadata.interfaces.IColumnDef;
+
 public class LessValueComparator extends AbstractValueComparator {
 
     public LessValueComparator(Object constantValue) {
         super(constantValue);
+    }
+    
+    public LessValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
+        super(constantValue, columnLeft, columnRight);
     }
 
     @Override

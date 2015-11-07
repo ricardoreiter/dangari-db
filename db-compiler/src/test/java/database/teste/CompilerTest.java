@@ -12,6 +12,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import database.command.ICommandExecutor;
+import database.command.SelectCommandExecutor;
 import database.gals.LexicalError;
 import database.gals.Lexico;
 import database.gals.SemanticError;
@@ -160,6 +161,21 @@ public class CompilerTest {
     @Test
     public void testSelectWhereCompile001() throws LexicalError, SyntaticError, SemanticError {
         List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.nome = \"teste\";");
+        
+        SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
+        Assert.assertEquals(6, executor.getSelectedColumns().size());
+        Assert.assertEquals("cod", executor.getSelectedColumns().get(0).getName());
+        Assert.assertEquals("nome", executor.getSelectedColumns().get(1).getName());
+        Assert.assertEquals("caractere", executor.getSelectedColumns().get(2).getName());
+        Assert.assertEquals("cod", executor.getSelectedColumns().get(3).getName());
+        Assert.assertEquals("nome", executor.getSelectedColumns().get(4).getName());
+        Assert.assertEquals("caractere", executor.getSelectedColumns().get(5).getName());
+        
+        Assert.assertEquals(2, executor.getTableList().size());
+        Assert.assertEquals("usuario", executor.getTableList().get(0).getName());
+        Assert.assertEquals("empresa", executor.getTableList().get(1).getName());
+        
+        Assert.assertEquals(0, executor.getWhereConditionsLogicalOperators().size());
     }
 
     @Test

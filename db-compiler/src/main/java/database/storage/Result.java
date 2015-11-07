@@ -2,6 +2,7 @@ package database.storage;
 
 import java.util.Map;
 
+import database.metadata.DataType;
 import database.metadata.interfaces.IColumnDef;
 import database.utils.Pair;
 
@@ -35,6 +36,13 @@ public class Result {
 		Pair<Integer, Integer> pair = map.get(columnDef);
 
 		return DataUtils.readInt(buffer, offset + pair.getFst());
+	}
+	
+	public Object getAsObject(IColumnDef column) {
+		if (column.getDataType() == DataType.INTEGER) {
+			return new Integer(getAsInteger(column));
+		}
+		return getAsString(column);
 	}
 
 	private int getOffset() {

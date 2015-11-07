@@ -6,9 +6,11 @@
 package database.metadata.interfaces;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import database.metadata.DataType;
+import database.utils.JoinUtils.IRegistry;
 
 /**
  * @author ricardo.reiter
@@ -34,5 +36,7 @@ public interface IDatabaseDef {
     void addTable(ITableDef tableDef, File tableFile);
 
     void insert(ITableDef tableDef, Map<IColumnDef, String> values);
+    
+    List<IRegistry> getRecords(ITableDef tableDef);
 
 }
