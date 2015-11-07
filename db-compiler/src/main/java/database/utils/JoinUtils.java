@@ -15,21 +15,25 @@ public class JoinUtils {
 
     private static void runRegistryComparators(IRegistry registry, List<AbstractValueComparator> comparators, boolean[] results) {
 
-        for (AbstractValueComparator comparator : comparators) {
-            boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft));
-            results[comparator.order] = result;
-        }
+    	if (comparators != null) {
+	        for (AbstractValueComparator comparator : comparators) {
+	            boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft));
+	            results[comparator.order] = result;
+	        }
+    	}
     }
 
     private static void runJoinComparators(IRegistry registry, HashMap<ITableDef, List<AbstractValueComparator>> joinConditions, boolean[] results) {
-        for (Entry<ITableDef, List<AbstractValueComparator>> entry : joinConditions.entrySet()) {
-            for (AbstractValueComparator comparator : entry.getValue()) {
-                if (registry.columnValue.containsKey(comparator.columnLeft) && registry.columnValue.containsKey(comparator.columnRight)) {
-                    boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
-                    results[comparator.order] = result;
-                }
-            }
-        }
+    	if (joinConditions != null) {
+	        for (Entry<ITableDef, List<AbstractValueComparator>> entry : joinConditions.entrySet()) {
+	            for (AbstractValueComparator comparator : entry.getValue()) {
+	                if (registry.columnValue.containsKey(comparator.columnLeft) && registry.columnValue.containsKey(comparator.columnRight)) {
+	                    boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
+	                    results[comparator.order] = result;
+	                }
+	            }
+	        }
+    	}
     }
 
     public static class IRegistry {
