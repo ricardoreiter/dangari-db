@@ -115,6 +115,9 @@ public class JoinUtils {
     }
 
     private static boolean isTrue(ArrayList<AbstractBooleanComparator> conditions, boolean[] values) {
+    	if (conditions.isEmpty()) {
+    		return values[0];
+    	}
         if (conditions.size() != values.length - 1) {
             throw new IllegalArgumentException("É necessário passra uma lista de comparadores que seja do tamanho da lista de valores - 1");
         }
