@@ -70,6 +70,7 @@ public class JoinUtils {
     public static List<IRegistry> joinTables(ArrayList<AbstractBooleanComparator> logicalComparators, TableJoinRegistry... registries) {
         List<IRegistry> result = new LinkedList<JoinUtils.IRegistry>();
         boolean[] comparatorsResult = new boolean[logicalComparators.size() + 1];
+        Arrays.fill(comparatorsResult, true);
 
         Arrays.sort(registries);
         result.addAll(checkTable(logicalComparators, 0, registries, comparatorsResult, new IRegistry()));

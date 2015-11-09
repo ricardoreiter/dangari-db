@@ -33,6 +33,9 @@ public class SelectCommandCompiler implements ICommandCompiler {
     private List<String> whereLogicalConditions = new LinkedList<>();
 
     private boolean isCompilingWhere = false;
+    private boolean newWhere = true;
+    
+    private int whereOrder = 0;
 
     private class WhereCondition {
 
@@ -40,6 +43,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
         public LinkedList<String> left;
         public String relationalOperation;
         public CompilerDataType dataType;
+        public int order;
     }
 
     @Override
@@ -54,7 +58,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
             case 11:
                 whereConditions.getLast().dataType = CompilerDataType.LITERAL;
                 whereConditions.getLast().right = new LinkedList<>();
-                whereConditions.getLast().right.add(token.getLexeme());
+                whereConditions.getLast().right.add(token.getLexeme().replace("\"", ""));
                 break;
             case 12:
                 whereConditions.getLast().dataType = CompilerDataType.NULL;
@@ -63,7 +67,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
                 break;
             case 40:
                 if (isCompilingWhere) {
-                    if (whereConditions.size() > 0 && whereConditions.getLast().relationalOperation != null) {
+                    if (!newWhere && whereConditions.size() > 0 && whereConditions.getLast().relationalOperation != null) {
                         whereConditions.getLast().right = new LinkedList<>();
                         whereConditions.getLast().right.add(token.getLexeme());
                         whereConditions.getLast().dataType = CompilerDataType.FIELD;
@@ -71,7 +75,9 @@ public class SelectCommandCompiler implements ICommandCompiler {
                         WhereCondition wc = new WhereCondition();
                         wc.left = new LinkedList<>();
                         wc.left.add(token.getLexeme());
+                        wc.order = whereOrder++;
                         whereConditions.add(wc);
+                        newWhere = false;
                     }
                 } else {
                     LinkedList<String> field = new LinkedList<String>();
@@ -111,6 +117,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
                 break;
             case 50:
                 whereLogicalConditions.add(token.getLexeme());
+                newWhere = true;
                 break;
         }
     }
@@ -213,12 +220,41 @@ public class SelectCommandCompiler implements ICommandCompiler {
         }
         return tableDef;
     }
+    
+    private ITableDef getWhereTableDef(IDatabaseDef database, LinkedList<String> tableAndField) throws SemanticError {
+    	 if (tableAndField.size() > 1) { // Se está estruturado em tabela.coluna
+             String table = tableAndField.getFirst();
+             String field = tableAndField.getLast();
+             String tableField = table + "." + field;
+
+             if (!selectedTables.contains(table)) {
+                 throw new SemanticError("Tabela " + table + " não está presente na cláusula FROM");
+             }
+             ITableDef tableDef = checkTable(database, table);
+
+             if (field.equals("*")) {
+                 throw new SemanticError("Não é possível utilizar a seleção de todos os campos '*', é necessário especificar um campo");
+             }
+             return tableDef;
+         } else {
+             if (selectedTables.size() > 1) {
+                 throw new SemanticError("Você deve informar a tabela para a coluna " + tableAndField.getFirst());
+             }
+             String tableField = tableAndField.getFirst();
+             ITableDef tableDef = checkTable(database, selectedTables.get(0));
+             IColumnDef columnDef = tableDef.getColumnDef(tableField);
+             if (columnDef == null) {
+                 throw new SemanticError("Tabela " + selectedTables.get(0) + " não possuí nenhuma coluna " + tableField);
+             }
+             return tableDef;
+         }
+    }
 
     private AbstractValueComparator getComparator(String operation, IColumnDef columnLeft, IColumnDef columnRight, Object constantValue) {
     	switch (operation) {
 		case "=":
 			return new EqualsValueComparator(constantValue, columnLeft, columnRight);
-		case "!=":
+		case "<>":
 			return new NotEqualsValueComparator(constantValue, columnLeft, columnRight);
 		case ">":
 			return new GreaterValueComparator(constantValue, columnLeft, columnRight);
@@ -277,14 +313,16 @@ public class SelectCommandCompiler implements ICommandCompiler {
 			tableLeftJoinComparators.put(tableRight, comparatorsList);
 		}
 		
-		comparatorsList.add(getComparator(whereCondition.relationalOperation, columnDef, rightColumn, null));
+		AbstractValueComparator comparator = getComparator(whereCondition.relationalOperation, columnDef, rightColumn, null);
+		comparator.setOrder(whereCondition.order);
+		comparatorsList.add(comparator);
 	}
 
 	private void addConstantValueComparator(IDatabaseDef database,
 			WhereCondition whereCondition,
 			HashMap<ITableDef, List<AbstractValueComparator>> tableComparators,
-			IColumnDef columnDef) {
-		ITableDef tableLeft = database.getTableDef(whereCondition.left.getFirst());
+			IColumnDef columnDef) throws SemanticError {
+		ITableDef tableLeft = getWhereTableDef(database, whereCondition.left);
 		List<AbstractValueComparator> list;
 		if (tableComparators.containsKey(tableLeft)) {
 			list = tableComparators.get(tableLeft);
@@ -298,7 +336,9 @@ public class SelectCommandCompiler implements ICommandCompiler {
 		} else {
 			constantValue = whereCondition.right.getFirst();
 		}
-		list.add(getComparator(whereCondition.relationalOperation, columnDef, null, constantValue));
+		AbstractValueComparator comparator = getComparator(whereCondition.relationalOperation, columnDef, null, constantValue);
+		comparator.setOrder(whereCondition.order);
+		list.add(comparator);
 	}
 
 }

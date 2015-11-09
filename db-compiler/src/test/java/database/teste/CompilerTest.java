@@ -20,6 +20,7 @@ import database.gals.Semantico;
 import database.gals.Sintatico;
 import database.gals.SyntaticError;
 import database.manager.DatabaseManager;
+import database.utils.EqualsValueComparator;
 
 /**
  * @author ricardo.reiter
@@ -186,6 +187,8 @@ public class CompilerTest {
     @Test
     public void testSelectWhereCompile003() throws LexicalError, SyntaticError, SemanticError {
         List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = 12 AND usuario.nome = \"Nomeloko\" OR usuario.cod = 10;");
+        SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
+        Assert.assertEquals(3, executor.getTableComparators().get(DatabaseManager.INSTANCE.getActualDatabase().getTableDef("usuario")).size());
     }
 
     @Test
@@ -196,6 +199,25 @@ public class CompilerTest {
     @Test
     public void testSelectWhereCompile005() throws LexicalError, SyntaticError, SemanticError {
         List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = empresa.cod AND empresa.cod = 10;");
+    }
+    
+    @Test
+    public void testSelectWhereCompile006() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("SELECT usuario.* FROM usuario WHERE nome = \"teste\";");
+        
+        SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
+        Assert.assertEquals(3, executor.getSelectedColumns().size());
+        Assert.assertEquals("cod", executor.getSelectedColumns().get(0).getName());
+        Assert.assertEquals("nome", executor.getSelectedColumns().get(1).getName());
+        Assert.assertEquals("caractere", executor.getSelectedColumns().get(2).getName());
+        
+        Assert.assertEquals(1, executor.getTableList().size());
+        Assert.assertEquals("usuario", executor.getTableList().get(0).getName());
+        
+        Assert.assertEquals(0, executor.getWhereConditionsLogicalOperators().size());
+        
+        Assert.assertEquals(1, executor.getTableComparators().get(executor.getTableList().get(0)).size());
+        Assert.assertTrue(executor.getTableComparators().get(executor.getTableList().get(0)).get(0) instanceof EqualsValueComparator);
     }
 
     @Test

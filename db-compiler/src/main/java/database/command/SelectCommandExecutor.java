@@ -70,13 +70,18 @@ public class SelectCommandExecutor implements ICommandExecutor {
         }
         
         CommandResult commandResult = new CommandResult();
+        i = 1;
         for (IColumnDef columnDef : selectedColumns) {
-        	commandResult.addColumn(columnDef.getName());
+        	commandResult.addColumn(columnDef.getName() + " - " + i);
+        	i++;
         }
+        
         List<IRegistry> result = JoinUtils.joinTables(whereConditionsLogicalOperators, tablesJoinRegistry);
         for (IRegistry registry : result) {
+        	i = 1;
         	for (IColumnDef columnDef : selectedColumns) {
-            	commandResult.addValue(columnDef.getName(), registry.columnValue.get(columnDef).toString());
+            	commandResult.addValue(columnDef.getName() + " - " + i, registry.columnValue.get(columnDef).toString());
+            	i++;
             }
         }
         return commandResult;

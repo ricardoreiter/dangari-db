@@ -13,8 +13,8 @@ public class LessOrEqualsValueComparator extends AbstractValueComparator {
     }
 
     @Override
-    public boolean isValid(Object valueRight) {
-        return ((Comparable<Object>) constantValue).compareTo(valueRight) <= 0;
+    public boolean isValid(Object valueLeft) {
+        return ((Comparable<Object>) valueLeft).compareTo(constantValue) <= 0;
     }
 
     @Override

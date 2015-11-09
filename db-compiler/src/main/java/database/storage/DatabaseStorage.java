@@ -76,8 +76,8 @@ public class DatabaseStorage {
                     DataUtils.writeString(strValue, size, buffer, offset);
                 }
 
-                offset += size;
             }
+            offset += size;
         }
     }
 

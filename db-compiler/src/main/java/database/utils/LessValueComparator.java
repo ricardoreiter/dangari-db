@@ -8,13 +8,17 @@ public class LessValueComparator extends AbstractValueComparator {
         super(constantValue);
     }
     
+    public LessValueComparator(Object constantValue, IColumnDef columnLeft) {
+    	super(constantValue, columnLeft);
+    }
+    
     public LessValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
         super(constantValue, columnLeft, columnRight);
     }
 
     @Override
-    public boolean isValid(Object valueRight) {
-        return ((Comparable<Object>) constantValue).compareTo(valueRight) < 0;
+    public boolean isValid(Object valueLeft) {
+        return ((Comparable<Object>) valueLeft).compareTo(constantValue) < 0;
     }
 
     @Override
