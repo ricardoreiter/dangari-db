@@ -23,7 +23,9 @@ public class Semantico implements Constants {
     public void executeAction(int action, Token token) throws SemanticError {
         System.out.println("Ação #" + action + ", Token: " + token);
         switch (action) {
-            case 70: // Fim de reconhecimento do comando, irá gerar o executor
+            case 70:
+                break;
+            case 71: // Fim de reconhecimento do comando, irá gerar o executor
                 executors.add(compiler.compile());
                 compiler = null;
                 break;
