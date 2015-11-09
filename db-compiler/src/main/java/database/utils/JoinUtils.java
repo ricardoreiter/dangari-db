@@ -15,25 +15,32 @@ public class JoinUtils {
 
     private static void runRegistryComparators(IRegistry registry, List<AbstractValueComparator> comparators, boolean[] results) {
 
-    	if (comparators != null) {
-	        for (AbstractValueComparator comparator : comparators) {
-	            boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft));
-	            results[comparator.order] = result;
-	        }
-    	}
+        if (comparators != null) {
+            for (AbstractValueComparator comparator : comparators) {
+                boolean result = false;
+                // Em algumas situações, ele pode comparar dois campos de uma mesma tabela, então não é considerado um joinComparator
+                if (comparator.columnRight != null) {
+                    result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
+                } else {
+                    result = comparator.isValid(registry.columnValue.get(comparator.columnLeft));
+                }
+
+                results[comparator.order] = result;
+            }
+        }
     }
 
     private static void runJoinComparators(IRegistry registry, HashMap<ITableDef, List<AbstractValueComparator>> joinConditions, boolean[] results) {
-    	if (joinConditions != null) {
-	        for (Entry<ITableDef, List<AbstractValueComparator>> entry : joinConditions.entrySet()) {
-	            for (AbstractValueComparator comparator : entry.getValue()) {
-	                if (registry.columnValue.containsKey(comparator.columnLeft) && registry.columnValue.containsKey(comparator.columnRight)) {
-	                    boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
-	                    results[comparator.order] = result;
-	                }
-	            }
-	        }
-    	}
+        if (joinConditions != null) {
+            for (Entry<ITableDef, List<AbstractValueComparator>> entry : joinConditions.entrySet()) {
+                for (AbstractValueComparator comparator : entry.getValue()) {
+                    if (registry.columnValue.containsKey(comparator.columnLeft) && registry.columnValue.containsKey(comparator.columnRight)) {
+                        boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
+                        results[comparator.order] = result;
+                    }
+                }
+            }
+        }
     }
 
     public static class IRegistry {
@@ -116,9 +123,9 @@ public class JoinUtils {
     }
 
     private static boolean isTrue(ArrayList<AbstractBooleanComparator> conditions, boolean[] values) {
-    	if (conditions.isEmpty()) {
-    		return values[0];
-    	}
+        if (conditions.isEmpty()) {
+            return values[0];
+        }
         if (conditions.size() != values.length - 1) {
             throw new IllegalArgumentException("É necessário passra uma lista de comparadores que seja do tamanho da lista de valores - 1");
         }
