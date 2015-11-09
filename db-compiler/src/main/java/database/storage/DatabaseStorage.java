@@ -30,7 +30,13 @@ public class DatabaseStorage {
 		DefStorage.updateRowsCount(file, tableDef);
 	}
 
-	public static Result getRecords(File file, ITableDef tableDef) {
+	public static Result getRecords(File table, ITableDef tableDef) {
+		try {
+			insertCache.get(table).getSnd().flush();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 		int recordSize = getRecordSize(tableDef);
 
 		int recordsCount = tableDef.getRowsCount();
@@ -38,7 +44,7 @@ public class DatabaseStorage {
 		int bufferSize = recordSize * recordsCount;
 		byte[] buffer = new byte[bufferSize];
 
-		File data = getTableDatFile(file);
+		File data = getTableDatFile(table);
 		try (FileInputStream input = new FileInputStream(data)) {
 			input.read(buffer);
 		} catch (Exception e) {
