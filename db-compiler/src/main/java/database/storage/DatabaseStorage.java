@@ -32,7 +32,10 @@ public class DatabaseStorage {
 
 	public static Result getRecords(File table, ITableDef tableDef) {
 		try {
-			insertCache.get(table).getSnd().flush();
+			Pair<Integer, FileOutputStream> pair = insertCache.get(table);
+			if(pair != null){
+				pair.getSnd().flush();
+			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -58,7 +61,7 @@ public class DatabaseStorage {
 
 		try {
 			Pair<Integer, FileOutputStream> pair = insertCache.get(table);
-			if(pair == null){
+			if (pair == null) {
 				pair = new Pair<Integer, FileOutputStream>(0, new FileOutputStream(table, true));
 				insertCache.put(table, pair);
 			}
