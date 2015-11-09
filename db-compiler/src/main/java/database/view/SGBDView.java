@@ -3,7 +3,6 @@ package database.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -47,7 +46,7 @@ import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
 
-public class SGBDView extends JFrame implements ActionListener {
+public class SGBDView extends JFrame {
 
     static {
         try {
@@ -163,8 +162,6 @@ public class SGBDView extends JFrame implements ActionListener {
 
         getContentPane().add(principal, BorderLayout.CENTER);
 
-        addListenerButton(getContentPane());
-
         setMinimumSize(new Dimension(800, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setExtendedState(MAXIMIZED_BOTH);
@@ -212,20 +209,6 @@ public class SGBDView extends JFrame implements ActionListener {
         resultTable.setModel(new ResultTableModel(commandResult));
     }
 
-    /**
-     * Adiciona o action listener desta classe para todos os componentes que são botões e menus.
-     */
-    private void addListenerButton(Container c) {
-        final Component[] components = c.getComponents();
-        for (final Component component : components) {
-            if (component instanceof Container) {
-                addListenerButton((Container) component);
-            } else if (component instanceof JButton) {
-                ((JButton) component).addActionListener(this);
-            }
-        }
-    }
-
     public static void main(String[] args) {
         new SGBDView();
     }
@@ -239,10 +222,6 @@ public class SGBDView extends JFrame implements ActionListener {
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(nodeName, true);
         node.add(newNode);
         return newNode;
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
     }
 
     private class DatabaseTreeCustomRenderer extends DefaultTreeCellRenderer {
