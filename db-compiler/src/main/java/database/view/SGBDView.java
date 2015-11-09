@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -68,8 +69,13 @@ public class SGBDView extends JFrame {
     private final JButton btnImportar = new JButton();
     private final JButton btnExportar = new JButton();
     private final JButton btnLimpar = new JButton();
+    private final JButton btnNextCommand = new JButton("Próx. Comando");
+    private final JButton btnPriorCommand = new JButton("Anterior Comando");
     private final JTable resultTable = new JTable();
     private JTextArea txtSql;
+    private LinkedList<String> commandList = new LinkedList<>();
+    private byte actualCommandIndex = 0;
+    private static final byte COMMAND_LIST_MAX_SIZE = 50;
 
     public SGBDView() {
         final JPanel panelBotton = new JPanel(new BorderLayout());
@@ -93,16 +99,21 @@ public class SGBDView extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                updateCommandList();
+
                 long initialTime = System.currentTimeMillis();
+
                 Lexico lexico = new Lexico(txtSql.getText());
                 Sintatico sintatico = new Sintatico();
                 Semantico semanticAnalyser = new Semantico();
                 CommandResult commandResult = new CommandResult();
+                int linesAffected = 0;
                 try {
                     sintatico.parse(lexico, semanticAnalyser);
                     for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
                         commandResult = executor.execute();
                         refreshResultConsole(commandResult);
+                        linesAffected += commandResult.getValues().entrySet().iterator().next().getValue().size();
                     }
                 } catch (LexicalError | SyntaticError | SemanticError e1) {
                     commandResult = new CommandResult();
@@ -111,8 +122,9 @@ public class SGBDView extends JFrame {
                     refreshResultConsole(commandResult);
                 }
                 long timeTook = System.currentTimeMillis() - initialTime;
-                updateStatusBar(timeTook, commandResult.getValues().entrySet().iterator().next().getValue().size());
+                updateStatusBar(timeTook, linesAffected);
             }
+
         });
 
         btnImportar.setToolTipText("F7 - Importar comandos SQL de um arquivo");
@@ -126,10 +138,29 @@ public class SGBDView extends JFrame {
         btnImportar.setFocusable(false);
         btnExportar.setFocusable(false);
         btnLimpar.setFocusable(false);
+
+        btnNextCommand.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nextCommand();
+            }
+        });
+
+        btnPriorCommand.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                priorCommand();
+            }
+        });
+
         painelBotoes.add(btnExecutar);
         painelBotoes.add(btnImportar);
         painelBotoes.add(btnExportar);
         painelBotoes.add(btnLimpar);
+        painelBotoes.add(btnPriorCommand);
+        painelBotoes.add(btnNextCommand);
         painelCentroTop.add(painelBotoes, BorderLayout.NORTH);
         splitVertical.setTopComponent(painelCentroTop);
         splitVertical.setBottomComponent(panelBotton);
@@ -172,9 +203,34 @@ public class SGBDView extends JFrame {
 
     }
 
-    /**
-     * 
-     */
+    private void updateCommandList() {
+        if (commandList.isEmpty() || !commandList.getLast().equals(txtSql.getText())) {
+            commandList.addLast(txtSql.getText());
+            if (commandList.size() > COMMAND_LIST_MAX_SIZE) {
+                commandList.removeFirst();
+            }
+            actualCommandIndex = (byte) (commandList.size() - 1);
+        }
+    }
+
+    private void nextCommand() {
+        if (!commandList.isEmpty()) {
+            if (actualCommandIndex < commandList.size() - 1) {
+                actualCommandIndex++;
+                txtSql.setText(commandList.get(actualCommandIndex));
+            }
+        }
+    }
+
+    private void priorCommand() {
+        if (!commandList.isEmpty()) {
+            if (actualCommandIndex > 0) {
+                actualCommandIndex--;
+                txtSql.setText(commandList.get(actualCommandIndex));
+            }
+        }
+    }
+
     private void updateStatusBar(long timeTook, int lines) {
         final JLabel txtInfo = new JLabel(String.format("Tempo total: %sms             %s linha(s)", timeTook, lines));
         txtInfo.setIcon(new ImageIcon("src/main/java/img/tempoTotal.png")); // TODO trocar para pegar do resource as stream
