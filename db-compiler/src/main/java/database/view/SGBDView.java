@@ -8,13 +8,15 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -25,6 +27,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
@@ -94,8 +97,7 @@ public class SGBDView extends JFrame {
         final JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnExecutar.setToolTipText("F5 - Executar o comando SQL");
 
-        // TODO: Teste
-        btnExecutar.addActionListener(new ActionListener() {
+        AbstractAction executeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -125,7 +127,27 @@ public class SGBDView extends JFrame {
                 updateStatusBar(timeTook, linesAffected);
             }
 
-        });
+        };
+
+        AbstractAction nextCommandAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nextCommand();
+            }
+        };
+
+        AbstractAction priorCommandAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                priorCommand();
+            }
+        };
+
+        btnNextCommand.addActionListener(nextCommandAction);
+        btnPriorCommand.addActionListener(priorCommandAction);
+        btnExecutar.addActionListener(executeAction);
 
         btnImportar.setToolTipText("F7 - Importar comandos SQL de um arquivo");
         btnExportar.setToolTipText("F8 - Exportar comandos SQL para um arquivo");
@@ -139,21 +161,12 @@ public class SGBDView extends JFrame {
         btnExportar.setFocusable(false);
         btnLimpar.setFocusable(false);
 
-        btnNextCommand.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nextCommand();
-            }
-        });
-
-        btnPriorCommand.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                priorCommand();
-            }
-        });
+        btnExecutar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), "F5");
+        btnExecutar.getActionMap().put("F5", executeAction);
+        btnNextCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK), "ALT+RIGHT");
+        btnNextCommand.getActionMap().put("ALT+RIGHT", nextCommandAction);
+        btnPriorCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK), "ALT+LEFT");
+        btnPriorCommand.getActionMap().put("ALT+LEFT", priorCommandAction);
 
         painelBotoes.add(btnExecutar);
         painelBotoes.add(btnImportar);
