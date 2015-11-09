@@ -3,18 +3,20 @@ package database.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -25,6 +27,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
@@ -47,7 +50,7 @@ import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
 
-public class SGBDView extends JFrame implements ActionListener {
+public class SGBDView extends JFrame {
 
     static {
         try {
@@ -69,8 +72,13 @@ public class SGBDView extends JFrame implements ActionListener {
     private final JButton btnImportar = new JButton();
     private final JButton btnExportar = new JButton();
     private final JButton btnLimpar = new JButton();
+    private final JButton btnNextCommand = new JButton("Próx. Comando");
+    private final JButton btnPriorCommand = new JButton("Anterior Comando");
     private final JTable resultTable = new JTable();
     private JTextArea txtSql;
+    private LinkedList<String> commandList = new LinkedList<>();
+    private byte actualCommandIndex = 0;
+    private static final byte COMMAND_LIST_MAX_SIZE = 50;
 
     public SGBDView() {
         final JPanel panelBotton = new JPanel(new BorderLayout());
@@ -89,21 +97,25 @@ public class SGBDView extends JFrame implements ActionListener {
         final JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnExecutar.setToolTipText("F5 - Executar o comando SQL");
 
-        // TODO: Teste
-        btnExecutar.addActionListener(new ActionListener() {
+        AbstractAction executeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                updateCommandList();
+
                 long initialTime = System.currentTimeMillis();
+
                 Lexico lexico = new Lexico(txtSql.getText());
                 Sintatico sintatico = new Sintatico();
                 Semantico semanticAnalyser = new Semantico();
                 CommandResult commandResult = new CommandResult();
+                int linesAffected = 0;
                 try {
                     sintatico.parse(lexico, semanticAnalyser);
                     for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
                         commandResult = executor.execute();
                         refreshResultConsole(commandResult);
+                        linesAffected += commandResult.getValues().entrySet().iterator().next().getValue().size();
                     }
                 } catch (LexicalError | SyntaticError | SemanticError e1) {
                     commandResult = new CommandResult();
@@ -112,9 +124,30 @@ public class SGBDView extends JFrame implements ActionListener {
                     refreshResultConsole(commandResult);
                 }
                 long timeTook = System.currentTimeMillis() - initialTime;
-                updateStatusBar(timeTook, commandResult.getValues().entrySet().iterator().next().getValue().size());
+                updateStatusBar(timeTook, linesAffected);
             }
-        });
+
+        };
+
+        AbstractAction nextCommandAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                nextCommand();
+            }
+        };
+
+        AbstractAction priorCommandAction = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                priorCommand();
+            }
+        };
+
+        btnNextCommand.addActionListener(nextCommandAction);
+        btnPriorCommand.addActionListener(priorCommandAction);
+        btnExecutar.addActionListener(executeAction);
 
         btnImportar.setToolTipText("F7 - Importar comandos SQL de um arquivo");
         btnExportar.setToolTipText("F8 - Exportar comandos SQL para um arquivo");
@@ -127,10 +160,20 @@ public class SGBDView extends JFrame implements ActionListener {
         btnImportar.setFocusable(false);
         btnExportar.setFocusable(false);
         btnLimpar.setFocusable(false);
+
+        btnExecutar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), "F5");
+        btnExecutar.getActionMap().put("F5", executeAction);
+        btnNextCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK), "ALT+RIGHT");
+        btnNextCommand.getActionMap().put("ALT+RIGHT", nextCommandAction);
+        btnPriorCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK), "ALT+LEFT");
+        btnPriorCommand.getActionMap().put("ALT+LEFT", priorCommandAction);
+
         painelBotoes.add(btnExecutar);
         painelBotoes.add(btnImportar);
         painelBotoes.add(btnExportar);
         painelBotoes.add(btnLimpar);
+        painelBotoes.add(btnPriorCommand);
+        painelBotoes.add(btnNextCommand);
         painelCentroTop.add(painelBotoes, BorderLayout.NORTH);
         splitVertical.setTopComponent(painelCentroTop);
         splitVertical.setBottomComponent(panelBotton);
@@ -163,8 +206,6 @@ public class SGBDView extends JFrame implements ActionListener {
 
         getContentPane().add(principal, BorderLayout.CENTER);
 
-        addListenerButton(getContentPane());
-
         setMinimumSize(new Dimension(800, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setExtendedState(MAXIMIZED_BOTH);
@@ -175,9 +216,34 @@ public class SGBDView extends JFrame implements ActionListener {
 
     }
 
-    /**
-     * 
-     */
+    private void updateCommandList() {
+        if (commandList.isEmpty() || !commandList.getLast().equals(txtSql.getText())) {
+            commandList.addLast(txtSql.getText());
+            if (commandList.size() > COMMAND_LIST_MAX_SIZE) {
+                commandList.removeFirst();
+            }
+            actualCommandIndex = (byte) (commandList.size() - 1);
+        }
+    }
+
+    private void nextCommand() {
+        if (!commandList.isEmpty()) {
+            if (actualCommandIndex < commandList.size() - 1) {
+                actualCommandIndex++;
+                txtSql.setText(commandList.get(actualCommandIndex));
+            }
+        }
+    }
+
+    private void priorCommand() {
+        if (!commandList.isEmpty()) {
+            if (actualCommandIndex > 0) {
+                actualCommandIndex--;
+                txtSql.setText(commandList.get(actualCommandIndex));
+            }
+        }
+    }
+
     private void updateStatusBar(long timeTook, int lines) {
         final JLabel txtInfo = new JLabel(String.format("Tempo total: %sms             %s linha(s)", timeTook, lines));
         txtInfo.setIcon(new ImageIcon("src/main/java/img/tempoTotal.png")); // TODO trocar para pegar do resource as stream
@@ -212,20 +278,6 @@ public class SGBDView extends JFrame implements ActionListener {
         resultTable.setModel(new ResultTableModel(commandResult));
     }
 
-    /**
-     * Adiciona o action listener desta classe para todos os componentes que são botões e menus.
-     */
-    private void addListenerButton(Container c) {
-        final Component[] components = c.getComponents();
-        for (final Component component : components) {
-            if (component instanceof Container) {
-                addListenerButton((Container) component);
-            } else if (component instanceof JButton) {
-                ((JButton) component).addActionListener(this);
-            }
-        }
-    }
-
     public static void main(String[] args) {
         new SGBDView();
     }
@@ -239,10 +291,6 @@ public class SGBDView extends JFrame implements ActionListener {
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(nodeName, true);
         node.add(newNode);
         return newNode;
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
     }
 
     private class DatabaseTreeCustomRenderer extends DefaultTreeCellRenderer {

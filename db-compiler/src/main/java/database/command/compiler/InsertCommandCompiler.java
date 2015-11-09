@@ -84,6 +84,9 @@ public class InsertCommandCompiler implements ICommandCompiler {
             if (actualColumn == null) {
                 throw new SemanticError("Campo [" + field + "] não existe na tabela [" + table + "]");
             }
+            if (columns.contains(actualColumn)) {
+                throw new SemanticError(String.format("Campo [%s] já declarado", field));
+            }
             columns.add(actualColumn);
         }
 

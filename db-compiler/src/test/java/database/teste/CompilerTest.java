@@ -162,7 +162,7 @@ public class CompilerTest {
     @Test
     public void testSelectWhereCompile001() throws LexicalError, SyntaticError, SemanticError {
         List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.nome = \"teste\";");
-        
+
         SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
         Assert.assertEquals(6, executor.getSelectedColumns().size());
         Assert.assertEquals("cod", executor.getSelectedColumns().get(0).getName());
@@ -171,11 +171,11 @@ public class CompilerTest {
         Assert.assertEquals("cod", executor.getSelectedColumns().get(3).getName());
         Assert.assertEquals("nome", executor.getSelectedColumns().get(4).getName());
         Assert.assertEquals("caractere", executor.getSelectedColumns().get(5).getName());
-        
+
         Assert.assertEquals(2, executor.getTableList().size());
         Assert.assertEquals("usuario", executor.getTableList().get(0).getName());
         Assert.assertEquals("empresa", executor.getTableList().get(1).getName());
-        
+
         Assert.assertEquals(0, executor.getWhereConditionsLogicalOperators().size());
     }
 
@@ -200,24 +200,69 @@ public class CompilerTest {
     public void testSelectWhereCompile005() throws LexicalError, SyntaticError, SemanticError {
         List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = empresa.cod AND empresa.cod = 10;");
     }
-    
+
     @Test
     public void testSelectWhereCompile006() throws LexicalError, SyntaticError, SemanticError {
         List<ICommandExecutor> commandExecutor = compile("SELECT usuario.* FROM usuario WHERE nome = \"teste\";");
-        
+
         SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
         Assert.assertEquals(3, executor.getSelectedColumns().size());
         Assert.assertEquals("cod", executor.getSelectedColumns().get(0).getName());
         Assert.assertEquals("nome", executor.getSelectedColumns().get(1).getName());
         Assert.assertEquals("caractere", executor.getSelectedColumns().get(2).getName());
-        
+
         Assert.assertEquals(1, executor.getTableList().size());
         Assert.assertEquals("usuario", executor.getTableList().get(0).getName());
-        
+
         Assert.assertEquals(0, executor.getWhereConditionsLogicalOperators().size());
-        
+
         Assert.assertEquals(1, executor.getTableComparators().get(executor.getTableList().get(0)).size());
         Assert.assertTrue(executor.getTableComparators().get(executor.getTableList().get(0)).get(0) instanceof EqualsValueComparator);
+    }
+
+    @Test
+    public void testSelectWhereCompile007() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("SELECT usuario.* FROM usuario WHERE nome = nome;");
+
+        SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
+        Assert.assertEquals(3, executor.getSelectedColumns().size());
+        Assert.assertEquals("cod", executor.getSelectedColumns().get(0).getName());
+        Assert.assertEquals("nome", executor.getSelectedColumns().get(1).getName());
+        Assert.assertEquals("caractere", executor.getSelectedColumns().get(2).getName());
+
+        Assert.assertEquals(1, executor.getTableList().size());
+        Assert.assertEquals("usuario", executor.getTableList().get(0).getName());
+
+        Assert.assertEquals(0, executor.getWhereConditionsLogicalOperators().size());
+
+        Assert.assertEquals(1, executor.getTableComparators().get(executor.getTableList().get(0)).size());
+        Assert.assertTrue(executor.getTableComparators().get(executor.getTableList().get(0)).get(0) instanceof EqualsValueComparator);
+        Assert.assertEquals("nome", executor.getTableComparators().get(executor.getTableList().get(0)).get(0).getColumnRight().getName());
+        Assert.assertEquals("nome", executor.getTableComparators().get(executor.getTableList().get(0)).get(0).getColumnLeft().getName());
+    }
+
+    @Test
+    public void testSelectWhereCompile008() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("SELECT usuario.* FROM usuario WHERE nome = \"teste\" or nome = \"juca\";");
+
+        SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
+        Assert.assertEquals(3, executor.getSelectedColumns().size());
+        Assert.assertEquals("cod", executor.getSelectedColumns().get(0).getName());
+        Assert.assertEquals("nome", executor.getSelectedColumns().get(1).getName());
+        Assert.assertEquals("caractere", executor.getSelectedColumns().get(2).getName());
+
+        Assert.assertEquals(1, executor.getTableList().size());
+        Assert.assertEquals("usuario", executor.getTableList().get(0).getName());
+
+        Assert.assertEquals(1, executor.getWhereConditionsLogicalOperators().size());
+
+        Assert.assertEquals(2, executor.getTableComparators().get(executor.getTableList().get(0)).size());
+        Assert.assertTrue(executor.getTableComparators().get(executor.getTableList().get(0)).get(0) instanceof EqualsValueComparator);
+        Assert.assertEquals("nome", executor.getTableComparators().get(executor.getTableList().get(0)).get(0).getColumnLeft().getName());
+        Assert.assertEquals(null, executor.getTableComparators().get(executor.getTableList().get(0)).get(0).getColumnRight());
+
+        Assert.assertEquals("nome", executor.getTableComparators().get(executor.getTableList().get(0)).get(1).getColumnLeft().getName());
+        Assert.assertEquals(null, executor.getTableComparators().get(executor.getTableList().get(0)).get(1).getColumnRight());
     }
 
     @Test
@@ -237,16 +282,6 @@ public class CompilerTest {
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
             Assert.assertEquals("Tipos incompatíveis, INTEGER e VARCHAR", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testSelectWhereCompile_Error003() throws LexicalError, SyntaticError, SemanticError {
-        try {
-            List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = usuario.cod;");
-            Assert.fail("Deveria dar erro");
-        } catch (SemanticError e) {
-            Assert.assertEquals("Campo usuario.cod já declarado", e.getMessage());
         }
     }
 
@@ -397,6 +432,16 @@ public class CompilerTest {
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
             Assert.assertEquals("Tipo [INTEGER] incompatível com o campo [caractere]. Era esperado um [CHAR]", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInsert_Error010() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("INSERT INTO usuario (nome, nome) VALUES (\"teste\", \"teste\");");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Campo [nome] já declarado", e.getMessage());
         }
     }
 
