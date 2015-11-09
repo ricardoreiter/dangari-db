@@ -19,13 +19,13 @@ public class JoinUtils {
             for (AbstractValueComparator comparator : comparators) {
                 boolean result = false;
                 // Em algumas situações, ele pode comparar dois campos de uma mesma tabela, então não é considerado um joinComparator
-                if (comparator.columnRight != null) {
-                    result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
+                if (comparator.getColumnRight() != null) {
+                    result = comparator.isValid(registry.columnValue.get(comparator.getColumnLeft()), registry.columnValue.get(comparator.getColumnRight()));
                 } else {
-                    result = comparator.isValid(registry.columnValue.get(comparator.columnLeft));
+                    result = comparator.isValid(registry.columnValue.get(comparator.getColumnLeft()));
                 }
 
-                results[comparator.order] = result;
+                results[comparator.getOrder()] = result;
             }
         }
     }
@@ -34,9 +34,9 @@ public class JoinUtils {
         if (joinConditions != null) {
             for (Entry<ITableDef, List<AbstractValueComparator>> entry : joinConditions.entrySet()) {
                 for (AbstractValueComparator comparator : entry.getValue()) {
-                    if (registry.columnValue.containsKey(comparator.columnLeft) && registry.columnValue.containsKey(comparator.columnRight)) {
-                        boolean result = comparator.isValid(registry.columnValue.get(comparator.columnLeft), registry.columnValue.get(comparator.columnRight));
-                        results[comparator.order] = result;
+                    if (registry.columnValue.containsKey(comparator.getColumnLeft()) && registry.columnValue.containsKey(comparator.getColumnRight())) {
+                        boolean result = comparator.isValid(registry.columnValue.get(comparator.getColumnLeft()), registry.columnValue.get(comparator.getColumnRight()));
+                        results[comparator.getOrder()] = result;
                     }
                 }
             }

@@ -4,10 +4,6 @@ import database.metadata.interfaces.IColumnDef;
 
 public class NotEqualsValueComparator extends AbstractValueComparator {
 
-    public NotEqualsValueComparator(Object constantValue) {
-        super(constantValue);
-    }
-
     public NotEqualsValueComparator(Object constantValue, IColumnDef columnLeft) {
         super(constantValue, columnLeft);
     }
@@ -18,7 +14,7 @@ public class NotEqualsValueComparator extends AbstractValueComparator {
 
     @Override
     public boolean isValid(Object valueRight) {
-        return !constantValue.equals(valueRight);
+        return !getConstantValue().equals(valueRight);
     }
 
     @Override

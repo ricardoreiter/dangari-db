@@ -4,12 +4,8 @@ import database.metadata.interfaces.IColumnDef;
 
 public class GreaterValueComparator extends AbstractValueComparator {
 
-    public GreaterValueComparator(Object constantValue) {
-        super(constantValue);
-    }
-    
     public GreaterValueComparator(Object constantValue, IColumnDef columnLeft) {
-    	super(constantValue, columnLeft);
+        super(constantValue, columnLeft);
     }
 
     public GreaterValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
@@ -18,7 +14,7 @@ public class GreaterValueComparator extends AbstractValueComparator {
 
     @Override
     public boolean isValid(Object valueLeft) {
-        return ((Comparable<Object>) valueLeft).compareTo(constantValue) > 0;
+        return ((Comparable<Object>) valueLeft).compareTo(getConstantValue()) > 0;
     }
 
     @Override

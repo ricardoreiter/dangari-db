@@ -4,22 +4,19 @@ import database.metadata.interfaces.IColumnDef;
 
 public abstract class AbstractValueComparator {
 
-    protected int order;
-    protected final Object constantValue;
-    protected IColumnDef columnLeft;
-    protected IColumnDef columnRight;
+    private int order;
+    private final Object constantValue;
+    private final IColumnDef columnLeft;
+    private final IColumnDef columnRight;
 
     public abstract boolean isValid(Object valueRight);
 
     public abstract boolean isValid(Object valueA, Object valueB);
 
-    public AbstractValueComparator(Object constantValue) {
-        this.constantValue = constantValue;
-    }
-
     public AbstractValueComparator(Object constantValue, IColumnDef columnLeft) {
         this.constantValue = constantValue;
         this.columnLeft = columnLeft;
+        this.columnRight = null;
     }
 
     public AbstractValueComparator(Object constantValue, IColumnDef columnLeft, IColumnDef columnRight) {
@@ -28,8 +25,36 @@ public abstract class AbstractValueComparator {
         this.columnRight = columnRight;
     }
 
+    /**
+     * @return the order
+     */
+    public int getOrder() {
+        return order;
+    }
+
+    /**
+     * @return the columnLeft
+     */
+    public IColumnDef getColumnLeft() {
+        return columnLeft;
+    }
+
+    /**
+     * @return the columnRight
+     */
+    public IColumnDef getColumnRight() {
+        return columnRight;
+    }
+
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    /**
+     * @return the constantValue
+     */
+    public Object getConstantValue() {
+        return constantValue;
     }
 
 }
