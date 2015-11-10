@@ -21,6 +21,8 @@ import database.gals.Semantico;
 import database.gals.Sintatico;
 import database.gals.SyntaticError;
 import database.manager.DatabaseManager;
+import database.metadata.interfaces.IDatabaseDef;
+import database.metadata.interfaces.ITableDef;
 import database.utils.EqualsValueComparator;
 
 /**
@@ -200,6 +202,24 @@ public class CompilerTest {
     @Test
     public void testSelectWhereCompile005() throws LexicalError, SyntaticError, SemanticError {
         List<ICommandExecutor> commandExecutor = compile("SELECT empresa.*, usuario.* FROM usuario, empresa WHERE usuario.cod = empresa.cod AND empresa.cod = 10;");
+        
+        SelectCommandExecutor executor = (SelectCommandExecutor) commandExecutor.get(0);
+        
+        ITableDef empresaDef = DatabaseManager.INSTANCE.getActualDatabase().getTableDef("empresa");
+        ITableDef usuarioDef = DatabaseManager.INSTANCE.getActualDatabase().getTableDef("usuario");
+        Assert.assertNotNull(executor.getTableJoinComparators().get(empresaDef));
+		Assert.assertNotNull(executor.getTableJoinComparators().get(empresaDef).get(usuarioDef));
+		Assert.assertEquals(1, executor.getTableJoinComparators().get(empresaDef).get(usuarioDef).size());
+		Assert.assertEquals(0, executor.getTableJoinComparators().get(empresaDef).get(usuarioDef).get(0).getOrder());
+		Assert.assertEquals("cod", executor.getTableJoinComparators().get(empresaDef).get(usuarioDef).get(0).getColumnLeft().getName());
+		Assert.assertEquals("cod", executor.getTableJoinComparators().get(empresaDef).get(usuarioDef).get(0).getColumnRight().getName());
+		
+		Assert.assertNotNull(executor.getTableJoinComparators().get(usuarioDef));
+		Assert.assertNotNull(executor.getTableJoinComparators().get(usuarioDef).get(empresaDef));
+		Assert.assertEquals(1, executor.getTableJoinComparators().get(usuarioDef).get(empresaDef).size());
+		Assert.assertEquals(0, executor.getTableJoinComparators().get(usuarioDef).get(empresaDef).get(0).getOrder());
+		Assert.assertEquals("cod", executor.getTableJoinComparators().get(usuarioDef).get(empresaDef).get(0).getColumnLeft().getName());
+		Assert.assertEquals("cod", executor.getTableJoinComparators().get(usuarioDef).get(empresaDef).get(0).getColumnRight().getName());
     }
 
     @Test

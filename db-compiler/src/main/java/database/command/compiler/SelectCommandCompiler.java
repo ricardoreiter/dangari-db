@@ -282,7 +282,12 @@ public class SelectCommandCompiler implements ICommandCompiler {
             if (leftTable == rightTable) { // se as tabelas dos dois campos são iguais, então não é um joinComparator
                 addTableComparator(database, whereCondition, tableComparators, leftColumn, leftTable, rightColumn);
             } else {
+            	// Adiciona o joinComparator na tabela left
                 addJoinComparators(database, whereCondition, tableComparators, tableJoinComparators, leftColumn, leftTable, rightColumn, rightTable);
+                
+                // Adiciona o mesmo joinComparator na tabela right (O algoritmo de join não sabe em qual das iterações das tabelas q ele vai executar, 
+                // ele só executa o joinComparator quanto já tem os registros de ambas as tabelas
+                addJoinComparators(database, whereCondition, tableComparators, tableJoinComparators, rightColumn, rightTable, leftColumn, leftTable);
             }
         } else {
             if (!whereCondition.dataType.getDataTypes().contains(leftColumn.getDataType())) {

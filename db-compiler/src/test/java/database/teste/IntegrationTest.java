@@ -146,5 +146,438 @@ public class IntegrationTest {
         Assert.assertEquals("Gabriel", columnNome.get(10));
         Assert.assertEquals("Juca", columnNome.get(11));
     }
+    
+    @Test
+    public void testSelect003() {
+        insertValues();
 
+        CommandResult result = compileAndExecute("SELECT usuario.nome FROM usuario, empresa, cargo;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(108, columnNome.size());
+    }
+    
+    @Test
+    public void testSelect004() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome FROM usuario, empresa;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(36, columnNome.size());
+    }
+    
+    @Test
+    public void testSelect005() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, cargo.* FROM usuario, cargo WHERE usuario.codCargo = cargo.cod;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(12, columnNome.size());
+        Assert.assertEquals("Ricardo fodao", columnNome.get(0));
+        Assert.assertEquals("Daniel", columnNome.get(1));
+        Assert.assertEquals("Juca", columnNome.get(2));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(3));
+        Assert.assertEquals("Daniel", columnNome.get(4));
+        Assert.assertEquals("Gabriel", columnNome.get(5));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(6));
+        Assert.assertEquals("Daniel", columnNome.get(7));
+        Assert.assertEquals("Juca", columnNome.get(8));
+        Assert.assertEquals("Juca", columnNome.get(9));
+        Assert.assertEquals("Gabriel", columnNome.get(10));
+        Assert.assertEquals("Gabriel", columnNome.get(11));
+        
+        List<String> columnCod = result.getValues().get("cod - 2");
+        Assert.assertEquals(12, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        Assert.assertEquals("1", columnCod.get(1));
+        Assert.assertEquals("1", columnCod.get(2));
+        Assert.assertEquals("1", columnCod.get(3));
+        Assert.assertEquals("1", columnCod.get(4));
+        Assert.assertEquals("1", columnCod.get(5));
+        Assert.assertEquals("1", columnCod.get(6));
+        Assert.assertEquals("1", columnCod.get(7));
+        Assert.assertEquals("2", columnCod.get(8));
+        Assert.assertEquals("2", columnCod.get(9));
+        Assert.assertEquals("3", columnCod.get(10));
+        Assert.assertEquals("3", columnCod.get(11));
+        
+        List<String> columnName = result.getValues().get("nome - 3");
+        Assert.assertEquals(12, columnName.size());
+        Assert.assertEquals("Programador", columnName.get(0));
+        Assert.assertEquals("Programador", columnName.get(1));
+        Assert.assertEquals("Programador", columnName.get(2));
+        Assert.assertEquals("Programador", columnName.get(3));
+        Assert.assertEquals("Programador", columnName.get(4));
+        Assert.assertEquals("Programador", columnName.get(5));
+        Assert.assertEquals("Programador", columnName.get(6));
+        Assert.assertEquals("Programador", columnName.get(7));
+        Assert.assertEquals("Analista", columnName.get(8));
+        Assert.assertEquals("Analista", columnName.get(9));
+        Assert.assertEquals("Projetista", columnName.get(10));
+        Assert.assertEquals("Projetista", columnName.get(11));
+    }
+    
+    @Test
+    public void testSelect006() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, cargo.cod FROM usuario, cargo WHERE usuario.codCargo = cargo.cod OR usuario.codCargo <> cargo.cod;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(36, columnNome.size());
+        Assert.assertEquals("Ricardo fodao", columnNome.get(0));
+        Assert.assertEquals("Daniel", columnNome.get(1));
+        Assert.assertEquals("Gabriel", columnNome.get(2));
+        Assert.assertEquals("Juca", columnNome.get(3));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(4));
+        Assert.assertEquals("Daniel", columnNome.get(5));
+        Assert.assertEquals("Gabriel", columnNome.get(6));
+        Assert.assertEquals("Juca", columnNome.get(7));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(8));
+        Assert.assertEquals("Daniel", columnNome.get(9));
+        Assert.assertEquals("Gabriel", columnNome.get(10));
+        Assert.assertEquals("Juca", columnNome.get(11));
+        
+        List<String> columnCod = result.getValues().get("cod - 2");
+        Assert.assertEquals(36, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        Assert.assertEquals("1", columnCod.get(1));
+        Assert.assertEquals("1", columnCod.get(2));
+        Assert.assertEquals("1", columnCod.get(3));
+        Assert.assertEquals("1", columnCod.get(4));
+        Assert.assertEquals("1", columnCod.get(5));
+        Assert.assertEquals("1", columnCod.get(6));
+        Assert.assertEquals("1", columnCod.get(7));
+        Assert.assertEquals("1", columnCod.get(8));
+        Assert.assertEquals("1", columnCod.get(9));
+        Assert.assertEquals("1", columnCod.get(10));
+        Assert.assertEquals("1", columnCod.get(11));
+        Assert.assertEquals("2", columnCod.get(12));
+        Assert.assertEquals("2", columnCod.get(13));
+        Assert.assertEquals("2", columnCod.get(14));
+        Assert.assertEquals("2", columnCod.get(15));
+        Assert.assertEquals("2", columnCod.get(16));
+        Assert.assertEquals("2", columnCod.get(17));
+        Assert.assertEquals("2", columnCod.get(18));
+        Assert.assertEquals("2", columnCod.get(19));
+        Assert.assertEquals("2", columnCod.get(20));
+        Assert.assertEquals("2", columnCod.get(21));
+        Assert.assertEquals("2", columnCod.get(22));
+        Assert.assertEquals("2", columnCod.get(23));
+        Assert.assertEquals("3", columnCod.get(24));
+        Assert.assertEquals("3", columnCod.get(25));
+        Assert.assertEquals("3", columnCod.get(26));
+        Assert.assertEquals("3", columnCod.get(27));
+        Assert.assertEquals("3", columnCod.get(28));
+        Assert.assertEquals("3", columnCod.get(29));
+        Assert.assertEquals("3", columnCod.get(30));
+        Assert.assertEquals("3", columnCod.get(31));
+        Assert.assertEquals("3", columnCod.get(32));
+        Assert.assertEquals("3", columnCod.get(33));
+        Assert.assertEquals("3", columnCod.get(34));
+        Assert.assertEquals("3", columnCod.get(35));
+    }
+    
+    @Test
+    public void testSelect007() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, cargo.cod FROM usuario, cargo WHERE usuario.codCargo = cargo.cod AND cargo.cod >= 3 OR usuario.cod < 2;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(11, columnNome.size());
+        Assert.assertEquals("Ricardo fodao", columnNome.get(0));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(1));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(2));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(3));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(4));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(5));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(6));
+        Assert.assertEquals("Gabriel", columnNome.get(7));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(8));
+        Assert.assertEquals("Ricardo fodao", columnNome.get(9));
+        Assert.assertEquals("Gabriel", columnNome.get(10));
+        
+        List<String> columnCod = result.getValues().get("cod - 2");
+        Assert.assertEquals(11, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        Assert.assertEquals("1", columnCod.get(1));
+        Assert.assertEquals("1", columnCod.get(2));
+        Assert.assertEquals("2", columnCod.get(3));
+        Assert.assertEquals("2", columnCod.get(4));
+        Assert.assertEquals("2", columnCod.get(5));
+        Assert.assertEquals("3", columnCod.get(6));
+        Assert.assertEquals("3", columnCod.get(7));
+        Assert.assertEquals("3", columnCod.get(8));
+        Assert.assertEquals("3", columnCod.get(9));
+        Assert.assertEquals("3", columnCod.get(10));
+    }
+
+    @Test
+    public void testSelect008() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.cod FROM empresa WHERE empresa.uf = \"Teste\";");
+
+        List<String> columnNome = result.getValues().get("cod - 1");
+        Assert.assertEquals(0, columnNome.size());
+    }
+    
+    @Test
+    public void testSelect009() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.cod FROM empresa WHERE empresa.uf = \"SC\";");
+
+        List<String> columnNome = result.getValues().get("cod - 1");
+        Assert.assertEquals(3, columnNome.size());
+        Assert.assertEquals("1", columnNome.get(0));
+        Assert.assertEquals("2", columnNome.get(1));
+        Assert.assertEquals("3", columnNome.get(2));
+    }
+    
+    @Test
+    public void testSelect010() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.cod FROM empresa WHERE empresa.uf > \"SB\";");
+
+        List<String> columnNome = result.getValues().get("cod - 1");
+        Assert.assertEquals(3, columnNome.size());
+        Assert.assertEquals("1", columnNome.get(0));
+        Assert.assertEquals("2", columnNome.get(1));
+        Assert.assertEquals("3", columnNome.get(2));
+    }
+    
+    @Test
+    public void testSelect011() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.cod FROM empresa WHERE empresa.uf < \"SD\";");
+
+        List<String> columnNome = result.getValues().get("cod - 1");
+        Assert.assertEquals(3, columnNome.size());
+        Assert.assertEquals("1", columnNome.get(0));
+        Assert.assertEquals("2", columnNome.get(1));
+        Assert.assertEquals("3", columnNome.get(2));
+    }
+    
+    @Test
+    public void testSelect012() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.cod FROM empresa WHERE empresa.uf <> \"SD\" AND empresa.cod >= 1;");
+
+        List<String> columnNome = result.getValues().get("cod - 1");
+        Assert.assertEquals(3, columnNome.size());
+        Assert.assertEquals("1", columnNome.get(0));
+        Assert.assertEquals("2", columnNome.get(1));
+        Assert.assertEquals("3", columnNome.get(2));
+    }
+    
+    @Test
+    public void testSelect013() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.cod FROM empresa WHERE empresa.uf = \"SD\" OR empresa.cod >= 1;");
+
+        List<String> columnNome = result.getValues().get("cod - 1");
+        Assert.assertEquals(3, columnNome.size());
+        Assert.assertEquals("1", columnNome.get(0));
+        Assert.assertEquals("2", columnNome.get(1));
+        Assert.assertEquals("3", columnNome.get(2));
+    }
+    
+    @Test
+    public void testSelect014() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.cod FROM empresa WHERE empresa.uf = \"SD\" AND empresa.cod >= 1;");
+
+        List<String> columnNome = result.getValues().get("cod - 1");
+        Assert.assertEquals(0, columnNome.size());
+    }
+    
+    @Test
+    public void testSelect015() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.nome FROM empresa WHERE empresa.uf = \"SD\" OR empresa.cod <= 1;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Furb", columnNome.get(0));
+    }
+    
+    @Test
+    public void testSelect016() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.nome FROM empresa WHERE empresa.uf = \"SD\" OR empresa.cod <> 2 AND empresa.cod <> 3;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Furb", columnNome.get(0));
+    }
+    
+    @Test
+    public void testSelect017() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.nome FROM empresa WHERE empresa.uf = \"SD\" OR empresa.cod <> 2 AND empresa.nome = \"Furb\";");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Furb", columnNome.get(0));
+    }
+    
+    @Test
+    public void testSelect018() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.nome FROM empresa WHERE empresa.uf = \"SD\" OR empresa.cod <> 2 or empresa.nome = \"Furb\";");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(2, columnNome.size());
+        Assert.assertEquals("Furb", columnNome.get(0));
+        Assert.assertEquals("TSystems", columnNome.get(1));
+    }
+    
+    @Test
+    public void testSelect019() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.nome FROM empresa WHERE empresa.uf = \"SD\" OR empresa.cod <> 2 or empresa.nome <> \"Senior\";");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(2, columnNome.size());
+        Assert.assertEquals("Furb", columnNome.get(0));
+        Assert.assertEquals("TSystems", columnNome.get(1));
+    }
+    
+    @Test
+    public void testSelect020() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT empresa.nome FROM empresa WHERE empresa.nome > \"TSystema\";");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("TSystems", columnNome.get(0));
+    }
+    
+    @Test
+    public void testSelect021() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, empresa.uf, cargo.nome FROM usuario, empresa, cargo WHERE usuario.codEmp = empresa.cod AND usuario.codCargo = cargo.cod AND cargo.cod >= 3 AND empresa.nome = \"Senior\";");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(0, columnNome.size());
+    }
+    
+    @Test
+    public void testSelect022() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, empresa.uf, cargo.nome FROM usuario, empresa, cargo WHERE usuario.codEmp = empresa.cod AND usuario.codCargo = cargo.cod AND cargo.cod >= 3 AND empresa.nome = \"TSystems\";");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Gabriel", columnNome.get(0));
+
+        List<String> columnUF = result.getValues().get("uf - 2");
+        Assert.assertEquals(1, columnUF.size());
+        Assert.assertEquals("SC", columnUF.get(0));
+        
+        List<String> columnNomeCargo = result.getValues().get("nome - 3");
+        Assert.assertEquals(1, columnNomeCargo.size());
+        Assert.assertEquals("Projetista", columnNomeCargo.get(0));
+    }
+    
+    @Test
+    public void testSelect023() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, empresa.uf, cargo.nome FROM usuario, empresa, cargo WHERE usuario.codEmp = empresa.cod AND usuario.codCargo = cargo.cod AND cargo.cod >= 3 AND empresa.nome = \"TSystems\" OR usuario.cod = 2 AND empresa.cod = 2 AND cargo.cod = 1;");
+
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(3, columnNome.size());
+        Assert.assertEquals("Daniel", columnNome.get(0));
+        Assert.assertEquals("Daniel", columnNome.get(1));
+        Assert.assertEquals("Daniel", columnNome.get(2));
+
+        List<String> columnUF = result.getValues().get("uf - 2");
+        Assert.assertEquals(3, columnUF.size());
+        Assert.assertEquals("SC", columnUF.get(0));
+        Assert.assertEquals("SC", columnUF.get(1));
+        Assert.assertEquals("SC", columnUF.get(2));
+        
+        List<String> columnNomeCargo = result.getValues().get("nome - 3");
+        Assert.assertEquals(3, columnNomeCargo.size());
+        Assert.assertEquals("Programador", columnNomeCargo.get(0));
+        Assert.assertEquals("Programador", columnNomeCargo.get(1));
+        Assert.assertEquals("Programador", columnNomeCargo.get(2));
+    }
+    
+    @Test
+    public void testSelect024() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, usuario.cod, usuario.codEmp, usuario.codCargo FROM usuario, empresa, cargo WHERE usuario.codEmp = empresa.cod AND usuario.codCargo = cargo.cod AND cargo.cod >= 3 AND empresa.nome = \"TSystems\" OR usuario.cod = 2 AND empresa.cod = 2 AND cargo.cod = 1 AND empresa.cod = usuario.codEmp AND cargo.cod = usuario.codCargo;");
+// 
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Daniel", columnNome.get(0));
+        
+        List<String> columnCodUsu = result.getValues().get("cod - 2");
+        Assert.assertEquals(1, columnCodUsu.size());
+        Assert.assertEquals("2", columnCodUsu.get(0));
+
+        List<String> columnUF = result.getValues().get("codEmp - 3");
+        Assert.assertEquals(1, columnUF.size());
+        Assert.assertEquals("2", columnUF.get(0));
+        
+        List<String> columnNomeCargo = result.getValues().get("codCargo - 4");
+        Assert.assertEquals(1, columnNomeCargo.size());
+        Assert.assertEquals("1", columnNomeCargo.get(0));
+    }
+    
+    @Test
+    public void testSelect025() {
+        insertValues();
+
+        CommandResult result = compileAndExecute("SELECT usuario.nome, usuario.cod, usuario.codEmp, usuario.codCargo FROM usuario, empresa, cargo WHERE empresa.cod = usuario.codEmp AND usuario.codCargo = cargo.cod AND usuario.nome = \"Gabriel\" OR usuario.nome = \"Juca\" AND empresa.cod = usuario.codEmp AND usuario.codCargo = cargo.cod;");
+// 
+        List<String> columnNome = result.getValues().get("nome - 1");
+        Assert.assertEquals(6, columnNome.size());
+        Assert.assertEquals("Juca", columnNome.get(0));
+        Assert.assertEquals("Gabriel", columnNome.get(1));
+        Assert.assertEquals("Gabriel", columnNome.get(2));
+        Assert.assertEquals("Juca", columnNome.get(3));
+        Assert.assertEquals("Juca", columnNome.get(4));
+        Assert.assertEquals("Gabriel", columnNome.get(5));
+        
+        List<String> columnCodUsu = result.getValues().get("cod - 2");
+        Assert.assertEquals(6, columnCodUsu.size());
+        Assert.assertEquals("4", columnCodUsu.get(0));
+        Assert.assertEquals("3", columnCodUsu.get(1));
+        
+
+        List<String> columnUF = result.getValues().get("codEmp - 3");
+        Assert.assertEquals(6, columnUF.size());
+        Assert.assertEquals("1", columnUF.get(0));
+        Assert.assertEquals("1", columnUF.get(1));
+        Assert.assertEquals("2", columnUF.get(2));
+        Assert.assertEquals("2", columnUF.get(3));
+        Assert.assertEquals("3", columnUF.get(4));
+        Assert.assertEquals("3", columnUF.get(5));
+        
+        List<String> columnNomeCargo = result.getValues().get("codCargo - 4");
+        Assert.assertEquals(6, columnNomeCargo.size());
+        Assert.assertEquals("1", columnNomeCargo.get(0));
+    }
+    
 }
