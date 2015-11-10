@@ -105,6 +105,168 @@ public class IntegrationTest {
         CommandResult result = compileAndExecute("INSERT INTO usuario (cod, codCargo, nome) values (1, 1, \"Ricardo fodao\");");
         Assert.assertEquals("Registro inserido", result.getValues().get("Info").get(0));
     }
+    
+    @Test
+    public void testInsert_Select001() {
+        CommandResult result = compileAndExecute("INSERT INTO usuario (cod, codCargo, nome, cpf) values (1, 1, \"Ricardo fodao\", \"89042100\");");
+     
+        result = compileAndExecute("SELECT usuario.* FROM usuario;");
+
+        List<String> columnCod = result.getValues().get("cod - 1");
+        Assert.assertEquals(1, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        
+        List<String> columnCodEmp = result.getValues().get("codEmp - 2");
+        Assert.assertEquals(1, columnCodEmp.size());
+        Assert.assertEquals("0", columnCodEmp.get(0));
+
+        List<String> columnCodCargo = result.getValues().get("codCargo - 3");
+        Assert.assertEquals(1, columnCodCargo.size());
+        Assert.assertEquals("1", columnCodCargo.get(0));
+        
+        List<String> columnNome = result.getValues().get("nome - 4");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Ricardo fodao", columnNome.get(0));
+
+        List<String> columnCPF = result.getValues().get("cpf - 5");
+        Assert.assertEquals(1, columnCPF.size());
+        Assert.assertEquals("89042100", columnCPF.get(0));
+    }
+    
+    @Test
+    public void testInsert_Select002() {
+        CommandResult result = compileAndExecute("INSERT INTO usuario (cod, codEmp, nome, cpf) values (1, 1, \"Ricardo fodao\", \"89042100\");");
+     
+        result = compileAndExecute("SELECT usuario.* FROM usuario;");
+
+        List<String> columnCod = result.getValues().get("cod - 1");
+        Assert.assertEquals(1, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        
+        List<String> columnCodEmp = result.getValues().get("codEmp - 2");
+        Assert.assertEquals(1, columnCodEmp.size());
+        Assert.assertEquals("1", columnCodEmp.get(0));
+
+        List<String> columnCodCargo = result.getValues().get("codCargo - 3");
+        Assert.assertEquals(1, columnCodCargo.size());
+        Assert.assertEquals("0", columnCodCargo.get(0));
+        
+        List<String> columnNome = result.getValues().get("nome - 4");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Ricardo fodao", columnNome.get(0));
+
+        List<String> columnCPF = result.getValues().get("cpf - 5");
+        Assert.assertEquals(1, columnCPF.size());
+        Assert.assertEquals("89042100", columnCPF.get(0));
+    }
+    
+    @Test
+    public void testInsert_Select003() {
+        CommandResult result = compileAndExecute("INSERT INTO usuario (nome, cpf) values (\"Ricardo fodao\", \"89042100\");");
+     
+        result = compileAndExecute("SELECT usuario.* FROM usuario;");
+
+        List<String> columnCod = result.getValues().get("cod - 1");
+        Assert.assertEquals(1, columnCod.size());
+        Assert.assertEquals("0", columnCod.get(0));
+        
+        List<String> columnCodEmp = result.getValues().get("codEmp - 2");
+        Assert.assertEquals(1, columnCodEmp.size());
+        Assert.assertEquals("0", columnCodEmp.get(0));
+
+        List<String> columnCodCargo = result.getValues().get("codCargo - 3");
+        Assert.assertEquals(1, columnCodCargo.size());
+        Assert.assertEquals("0", columnCodCargo.get(0));
+        
+        List<String> columnNome = result.getValues().get("nome - 4");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Ricardo fodao", columnNome.get(0));
+
+        List<String> columnCPF = result.getValues().get("cpf - 5");
+        Assert.assertEquals(1, columnCPF.size());
+        Assert.assertEquals("89042100", columnCPF.get(0));
+    }
+    
+    @Test
+    public void testInsert_Select004() {
+        CommandResult result = compileAndExecute("INSERT INTO usuario (nome, cod) values (\"Ricardo fodao\", 1);");
+     
+        result = compileAndExecute("SELECT usuario.* FROM usuario;");
+
+        List<String> columnCod = result.getValues().get("cod - 1");
+        Assert.assertEquals(1, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        
+        List<String> columnCodEmp = result.getValues().get("codEmp - 2");
+        Assert.assertEquals(1, columnCodEmp.size());
+        Assert.assertEquals("0", columnCodEmp.get(0));
+
+        List<String> columnCodCargo = result.getValues().get("codCargo - 3");
+        Assert.assertEquals(1, columnCodCargo.size());
+        Assert.assertEquals("0", columnCodCargo.get(0));
+        
+        List<String> columnNome = result.getValues().get("nome - 4");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("Ricardo fodao", columnNome.get(0));
+
+        List<String> columnCPF = result.getValues().get("cpf - 5");
+        Assert.assertEquals(1, columnCPF.size());
+        Assert.assertEquals("", columnCPF.get(0));
+    }
+    
+    @Test
+    public void testInsert_Select005() {
+        CommandResult result = compileAndExecute("INSERT INTO usuario (codCargo, cod, cpf) values (2, 1, \"12345678\");");
+     
+        result = compileAndExecute("SELECT usuario.* FROM usuario;");
+
+        List<String> columnCod = result.getValues().get("cod - 1");
+        Assert.assertEquals(1, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        
+        List<String> columnCodEmp = result.getValues().get("codEmp - 2");
+        Assert.assertEquals(1, columnCodEmp.size());
+        Assert.assertEquals("0", columnCodEmp.get(0));
+
+        List<String> columnCodCargo = result.getValues().get("codCargo - 3");
+        Assert.assertEquals(1, columnCodCargo.size());
+        Assert.assertEquals("2", columnCodCargo.get(0));
+        
+        List<String> columnNome = result.getValues().get("nome - 4");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("", columnNome.get(0));
+
+        List<String> columnCPF = result.getValues().get("cpf - 5");
+        Assert.assertEquals(1, columnCPF.size());
+        Assert.assertEquals("12345678", columnCPF.get(0));
+    }
+    
+    @Test
+    public void testInsert_Select006() {
+        CommandResult result = compileAndExecute("INSERT INTO usuario (codCargo, cod) values (2, 1);");
+     
+        result = compileAndExecute("SELECT usuario.* FROM usuario;");
+
+        List<String> columnCod = result.getValues().get("cod - 1");
+        Assert.assertEquals(1, columnCod.size());
+        Assert.assertEquals("1", columnCod.get(0));
+        
+        List<String> columnCodEmp = result.getValues().get("codEmp - 2");
+        Assert.assertEquals(1, columnCodEmp.size());
+        Assert.assertEquals("0", columnCodEmp.get(0));
+
+        List<String> columnCodCargo = result.getValues().get("codCargo - 3");
+        Assert.assertEquals(1, columnCodCargo.size());
+        Assert.assertEquals("2", columnCodCargo.get(0));
+        
+        List<String> columnNome = result.getValues().get("nome - 4");
+        Assert.assertEquals(1, columnNome.size());
+        Assert.assertEquals("", columnNome.get(0));
+
+        List<String> columnCPF = result.getValues().get("cpf - 5");
+        Assert.assertEquals(1, columnCPF.size());
+        Assert.assertEquals("", columnCPF.get(0));
+    }
 
     @Test
     public void testSelect001() {
