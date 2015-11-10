@@ -7,6 +7,7 @@ import database.command.ICommandExecutor;
 import database.command.compiler.AlterDatabaseCommandCompiler;
 import database.command.compiler.CreateDatabaseCommandCompiler;
 import database.command.compiler.CreateTableCommandCompiler;
+import database.command.compiler.DropTableCommandCompiler;
 import database.command.compiler.ICommandCompiler;
 import database.command.compiler.InsertCommandCompiler;
 import database.command.compiler.SelectCommandCompiler;
@@ -46,6 +47,12 @@ public class Semantico implements Constants {
             case 40: // Início de reconhecimento do select
                 if (compiler == null) {
                     compiler = new SelectCommandCompiler();
+                }
+                compiler.accept(action, token);
+                break;
+            case 60:
+                if (compiler == null) {
+                    compiler = new DropTableCommandCompiler();
                 }
                 compiler.accept(action, token);
                 break;

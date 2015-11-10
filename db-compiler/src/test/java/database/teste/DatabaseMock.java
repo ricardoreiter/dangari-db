@@ -16,7 +16,6 @@ import database.metadata.TableDef;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
-import database.storage.Result;
 import database.utils.JoinUtils.IRegistry;
 
 /**
@@ -104,10 +103,19 @@ public class DatabaseMock implements IDatabaseDef {
 
     }
 
-	@Override
-	public List<IRegistry> getRecords(ITableDef tableDef) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<IRegistry> getRecords(ITableDef tableDef) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see database.metadata.interfaces.IDatabaseDef#removeTable(database.metadata.interfaces.ITableDef)
+     */
+    @Override
+    public void removeTable(ITableDef tableDef) {
+        // TODO Auto-generated method stub
+
+    }
 
 }

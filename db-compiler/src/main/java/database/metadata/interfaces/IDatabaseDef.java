@@ -36,7 +36,12 @@ public interface IDatabaseDef {
     void addTable(ITableDef tableDef, File tableFile);
 
     void insert(ITableDef tableDef, Map<IColumnDef, String> values);
-    
+
     List<IRegistry> getRecords(ITableDef tableDef);
+
+    /**
+     * @param tableDef
+     */
+    void removeTable(ITableDef tableDef);
 
 }

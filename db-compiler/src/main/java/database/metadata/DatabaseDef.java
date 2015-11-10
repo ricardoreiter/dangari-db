@@ -82,23 +82,34 @@ public class DatabaseDef implements IDatabaseDef {
         return this.name;
     }
 
-	@Override
-	public List<IRegistry> getRecords(ITableDef tableDef) {
-		File tableFile = tables.get(tableDef);
-		
-		Result recordsResult = DatabaseStorage.getRecords(tableFile, tableDef);
-		List<IRegistry> listRegistrys = new LinkedList<JoinUtils.IRegistry>();
+    @Override
+    public List<IRegistry> getRecords(ITableDef tableDef) {
+        File tableFile = tables.get(tableDef);
+
+        Result recordsResult = DatabaseStorage.getRecords(tableFile, tableDef);
+        List<IRegistry> listRegistrys = new LinkedList<JoinUtils.IRegistry>();
         for (int i = 0; i < tableDef.getRowsCount(); i++) {
-        	IRegistry newRegistry = new IRegistry();
-        	
-        	for (IColumnDef column : tableDef.getColumns()) {
-        		newRegistry.columnValue.put(column, recordsResult.getAsObject(column));
-        	}
-        	
-        	listRegistrys.add(newRegistry);
-        	recordsResult.next();
+            IRegistry newRegistry = new IRegistry();
+
+            for (IColumnDef column : tableDef.getColumns()) {
+                newRegistry.columnValue.put(column, recordsResult.getAsObject(column));
+            }
+
+            listRegistrys.add(newRegistry);
+            recordsResult.next();
         }
-		return listRegistrys;
-	}
+        return listRegistrys;
+    }
+
+    @Override
+    public void removeTable(ITableDef tableDef) {
+        File fileTable = tables.get(tableDef);
+        for (File file : fileTable.listFiles()) {
+            file.delete();
+        }
+        fileTable.delete();
+        tables.remove(tableDef);
+        tablesByName.remove(tableDef.getName());
+    }
 
 }
