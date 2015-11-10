@@ -295,7 +295,7 @@ public class SelectCommandCompiler implements ICommandCompiler {
 
     private void addJoinComparators(IDatabaseDef database, WhereCondition whereCondition, HashMap<ITableDef, List<AbstractValueComparator>> tableComparators, Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators, IColumnDef columnDef, ITableDef leftTable, IColumnDef rightColumn, ITableDef rightTable) {
         HashMap<ITableDef, List<AbstractValueComparator>> tableLeftJoinComparators;
-        if (tableComparators.containsKey(leftTable)) {
+        if (tableJoinComparators.containsKey(leftTable)) {
             tableLeftJoinComparators = tableJoinComparators.get(leftTable);
         } else {
             tableLeftJoinComparators = new HashMap<ITableDef, List<AbstractValueComparator>>();
