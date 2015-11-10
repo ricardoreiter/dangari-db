@@ -24,4 +24,8 @@ public class DropTableCommandExecutor implements ICommandExecutor {
         return commandResult;
     }
 
+    public ITableDef getTable() {
+        return tableDef;
+    }
+
 }

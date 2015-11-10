@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import database.command.DropTableCommandExecutor;
 import database.command.ICommandExecutor;
 import database.command.SelectCommandExecutor;
 import database.gals.LexicalError;
@@ -442,6 +443,32 @@ public class CompilerTest {
             Assert.fail("Deveria dar erro");
         } catch (SemanticError e) {
             Assert.assertEquals("Campo [nome] já declarado", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testDropTableCompile001() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("DROP TABLE usuario;");
+
+        DropTableCommandExecutor executor = (DropTableCommandExecutor) commandExecutor.get(0);
+        Assert.assertEquals("usuario", executor.getTable().getName());
+    }
+
+    @Test
+    public void testDropTableCompile002() throws LexicalError, SyntaticError, SemanticError {
+        List<ICommandExecutor> commandExecutor = compile("DROP TABLE empresa;");
+
+        DropTableCommandExecutor executor = (DropTableCommandExecutor) commandExecutor.get(0);
+        Assert.assertEquals("empresa", executor.getTable().getName());
+    }
+
+    @Test
+    public void testDropTableCompile_Error001() throws LexicalError, SyntaticError, SemanticError {
+        try {
+            List<ICommandExecutor> commandExecutor = compile("DROP TABLE naoexiste;");
+            Assert.fail("Deveria dar erro");
+        } catch (SemanticError e) {
+            Assert.assertEquals("Tabela [naoexiste] não existe", e.getMessage());
         }
     }
 
