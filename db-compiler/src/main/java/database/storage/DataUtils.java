@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 public class DataUtils {
 
-	public static final int STR_BYTES = 3;
+	public static final int STR_BYTES = 2;
 
 	public static String readString(byte[] buffer, int offset, int length) {
 		byte[] strBuffer = new byte[length];

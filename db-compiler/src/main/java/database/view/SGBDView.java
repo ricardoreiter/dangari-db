@@ -52,258 +52,276 @@ import database.metadata.interfaces.ITableDef;
 
 public class SGBDView extends JFrame {
 
-    static {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (final Exception e) {
-            System.err.println("Problemas com o look and feel");
-            e.printStackTrace();
-        }
-    }
+	static {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (final Exception e) {
+			System.err.println("Problemas com o look and feel");
+			e.printStackTrace();
+		}
+	}
 
-    private static final long serialVersionUID = 1L;
-    private final JSplitPane splitVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    private final JSplitPane splitHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    private final JTree jTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode("Databases")));
-    private final DefaultTreeModel treeModel;
-    private final JMenuBar menuBar = new JMenuBar();
-    private final JToolBar toolBar = new JToolBar();
-    private final JButton btnExecutar = new JButton();
-    private final JButton btnImportar = new JButton();
-    private final JButton btnExportar = new JButton();
-    private final JButton btnLimpar = new JButton();
-    private final JButton btnNextCommand = new JButton("Próx. Comando");
-    private final JButton btnPriorCommand = new JButton("Anterior Comando");
-    private final JTable resultTable = new JTable();
-    private JTextArea txtSql;
-    private LinkedList<String> commandList = new LinkedList<>();
-    private byte actualCommandIndex = 0;
-    private static final byte COMMAND_LIST_MAX_SIZE = 50;
+	private static final long serialVersionUID = 1L;
+	private final JSplitPane splitVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	private final JSplitPane splitHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+	private final JTree jTree = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode("Databases")));
+	private final DefaultTreeModel treeModel;
+	private final JMenuBar menuBar = new JMenuBar();
+	private final JToolBar toolBar = new JToolBar();
+	private final JButton btnExecutar = new JButton();
+	private final JButton btnImportar = new JButton();
+	private final JButton btnExportar = new JButton();
+	private final JButton btnLimpar = new JButton();
+	private final JButton btnNextCommand = new JButton();
+	private final JButton btnPriorCommand = new JButton();
+	private final JTable resultTable = new JTable();
+	private JTextArea txtSql;
+	private LinkedList<String> commandList = new LinkedList<>();
+	private byte actualCommandIndex = 0;
+	private static final byte COMMAND_LIST_MAX_SIZE = 50;
 
-    public SGBDView() {
-        final JPanel panelBotton = new JPanel(new BorderLayout());
-        final JScrollPane spBottom = new JScrollPane(resultTable);
-        panelBotton.add(spBottom, BorderLayout.CENTER);
-        panelBotton.add(toolBar, BorderLayout.SOUTH);
-        final JPanel painelCentroTop = new JPanel(new BorderLayout());
-        txtSql = new JTextArea();
-        txtSql.setBorder(new NumberedBorder());
-        final JScrollPane spTop = new JScrollPane(txtSql);
-        final JPanel principal = new JPanel(new BorderLayout());
-        treeModel = (DefaultTreeModel) jTree.getModel();
-        jTree.setCellRenderer(new DatabaseTreeCustomRenderer());
+	public SGBDView() {
+		final JPanel panelBotton = new JPanel(new BorderLayout());
+		final JScrollPane spBottom = new JScrollPane(resultTable);
+		panelBotton.add(spBottom, BorderLayout.CENTER);
+		panelBotton.add(toolBar, BorderLayout.SOUTH);
+		final JPanel painelCentroTop = new JPanel(new BorderLayout());
+		txtSql = new JTextArea();
+		txtSql.setBorder(new NumberedBorder());
+		final JScrollPane spTop = new JScrollPane(txtSql);
+		final JPanel principal = new JPanel(new BorderLayout());
+		treeModel = (DefaultTreeModel) jTree.getModel();
+		jTree.setCellRenderer(new DatabaseTreeCustomRenderer());
 
-        painelCentroTop.add(spTop, BorderLayout.CENTER);
-        final JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        btnExecutar.setToolTipText("F5 - Executar o comando SQL");
+		painelCentroTop.add(spTop, BorderLayout.CENTER);
+		final JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        AbstractAction executeAction = new AbstractAction() {
+		AbstractAction executeAction = new AbstractAction() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateCommandList();
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateCommandList();
 
-                long initialTime = System.currentTimeMillis();
+				long initialTime = System.currentTimeMillis();
 
-                Lexico lexico = new Lexico(txtSql.getText());
-                Sintatico sintatico = new Sintatico();
-                Semantico semanticAnalyser = new Semantico();
-                CommandResult commandResult = new CommandResult();
-                int linesAffected = 0;
-                try {
-                    sintatico.parse(lexico, semanticAnalyser);
-                    for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
-                        commandResult = executor.execute();
-                        refreshResultConsole(commandResult);
-                        linesAffected += commandResult.getValues().entrySet().iterator().next().getValue().size();
-                    }
-                } catch (LexicalError | SyntaticError | SemanticError e1) {
-                    commandResult = new CommandResult();
-                    commandResult.addColumn("Erro");
-                    commandResult.addValue("Erro", e1.getMessage());
-                    refreshResultConsole(commandResult);
-                }
-                long timeTook = System.currentTimeMillis() - initialTime;
-                updateStatusBar(timeTook, linesAffected);
-            }
+				Lexico lexico = new Lexico(txtSql.getText());
+				Sintatico sintatico = new Sintatico();
+				Semantico semanticAnalyser = new Semantico();
+				CommandResult commandResult = new CommandResult();
+				int linesAffected = 0;
+				try {
+					sintatico.parse(lexico, semanticAnalyser);
+					for (ICommandExecutor executor : semanticAnalyser.getExecutor()) {
+						commandResult = executor.execute();
+						refreshResultConsole(commandResult);
+						linesAffected += commandResult.getValues().entrySet().iterator().next().getValue().size();
+					}
+				} catch (LexicalError | SyntaticError | SemanticError e1) {
+					commandResult = new CommandResult();
+					commandResult.addColumn("Erro");
+					commandResult.addValue("Erro", e1.getMessage());
+					refreshResultConsole(commandResult);
+				}
+				long timeTook = System.currentTimeMillis() - initialTime;
+				updateStatusBar(timeTook, linesAffected);
+			}
 
-        };
+		};
 
-        AbstractAction nextCommandAction = new AbstractAction() {
+		AbstractAction nextCommandAction = new AbstractAction() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                nextCommand();
-            }
-        };
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				nextCommand();
+			}
+		};
 
-        AbstractAction priorCommandAction = new AbstractAction() {
+		AbstractAction priorCommandAction = new AbstractAction() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                priorCommand();
-            }
-        };
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				priorCommand();
+			}
+		};
 
-        btnNextCommand.addActionListener(nextCommandAction);
-        btnPriorCommand.addActionListener(priorCommandAction);
-        btnExecutar.addActionListener(executeAction);
+		btnNextCommand.addActionListener(nextCommandAction);
+		btnPriorCommand.addActionListener(priorCommandAction);
+		btnExecutar.addActionListener(executeAction);
 
-        btnImportar.setToolTipText("F7 - Importar comandos SQL de um arquivo");
-        btnExportar.setToolTipText("F8 - Exportar comandos SQL para um arquivo");
-        btnLimpar.setToolTipText("F9 - Limpar");
-        btnExecutar.setIcon(new ImageIcon("src/main/java/img/executar.png"));// TODO corrigir
-        btnImportar.setIcon(new ImageIcon("src/main/java/img/importar.png"));
-        btnExportar.setIcon(new ImageIcon("src/main/java/img/exportar.png"));
-        btnLimpar.setIcon(new ImageIcon("src/main/java/img/limpar.png"));
-        btnExecutar.setFocusable(false);
-        btnImportar.setFocusable(false);
-        btnExportar.setFocusable(false);
-        btnLimpar.setFocusable(false);
+		btnExecutar.setToolTipText("F5 Executar o comando SQL");
+		btnImportar.setToolTipText("F7 Importar comandos SQL de um arquivo");
+		btnExportar.setToolTipText("F8 Exportar comandos SQL para um arquivo");
+		btnLimpar.setToolTipText("F9 Limpar");
+		btnNextCommand.setToolTipText("Alt + > Avança para o próximo comando");
+		btnPriorCommand.setToolTipText("Alt + < Retorna para o comando anterior");
+		btnExecutar.setIcon(new ImageIcon("src/main/java/img/run.png"));// TODO
+																					// corrigir
+		btnImportar.setIcon(new ImageIcon("src/main/java/img/importar.png"));
+		btnExportar.setIcon(new ImageIcon("src/main/java/img/exportar.png"));
+		btnLimpar.setIcon(new ImageIcon("src/main/java/img/limpar.png"));
+		btnNextCommand.setIcon(new ImageIcon("src/main/java/img/next.png"));
+		btnPriorCommand.setIcon(new ImageIcon("src/main/java/img/previous.png"));
 
-        btnExecutar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), "F5");
-        btnExecutar.getActionMap().put("F5", executeAction);
-        btnNextCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK), "ALT+RIGHT");
-        btnNextCommand.getActionMap().put("ALT+RIGHT", nextCommandAction);
-        btnPriorCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK), "ALT+LEFT");
-        btnPriorCommand.getActionMap().put("ALT+LEFT", priorCommandAction);
+		btnExecutar.setFocusable(false);
+		btnImportar.setFocusable(false);
+		btnExportar.setFocusable(false);
+		btnLimpar.setFocusable(false);
 
-        painelBotoes.add(btnExecutar);
-        painelBotoes.add(btnImportar);
-        painelBotoes.add(btnExportar);
-        painelBotoes.add(btnLimpar);
-        painelBotoes.add(btnPriorCommand);
-        painelBotoes.add(btnNextCommand);
-        painelCentroTop.add(painelBotoes, BorderLayout.NORTH);
-        splitVertical.setTopComponent(painelCentroTop);
-        splitVertical.setBottomComponent(panelBotton);
-        splitHorizontal.setLeftComponent(jTree);
-        splitHorizontal.setRightComponent(splitVertical);
+		btnExecutar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), "F5");
+		btnExecutar.getActionMap().put("F5", executeAction);
+		btnNextCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.ALT_DOWN_MASK), "ALT+RIGHT");
+		btnNextCommand.getActionMap().put("ALT+RIGHT", nextCommandAction);
+		btnPriorCommand.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+				.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.ALT_DOWN_MASK), "ALT+LEFT");
+		btnPriorCommand.getActionMap().put("ALT+LEFT", priorCommandAction);
 
-        updateStatusBar(0, 0);
-        final JLabel lblEquipe = new JLabel("SGBD DANGARI");
-        lblEquipe.setBorder(new LineBorder(Color.BLACK));
-        lblEquipe.setHorizontalAlignment(SwingConstants.CENTER);
-        lblEquipe.setFont(new Font("tahoma", Font.BOLD, 18));
-        final JPanel painelCentro = new JPanel(new BorderLayout());
-        painelCentro.add(lblEquipe, BorderLayout.CENTER);
+		painelBotoes.add(btnExecutar);
+		painelBotoes.add(btnPriorCommand);
+		painelBotoes.add(btnNextCommand);
+		painelBotoes.add(btnImportar);
+		painelBotoes.add(btnExportar);
+		painelBotoes.add(btnLimpar);
+		painelCentroTop.add(painelBotoes, BorderLayout.NORTH);
+		splitVertical.setTopComponent(painelCentroTop);
+		splitVertical.setBottomComponent(panelBotton);
+		splitHorizontal.setLeftComponent(jTree);
+		splitHorizontal.setRightComponent(splitVertical);
 
-        menuBar.add(painelCentro);
+		updateStatusBar(0, 0);
+		final JLabel lblEquipe = new JLabel("SGBD DANGARI");
+		lblEquipe.setBorder(new LineBorder(Color.BLACK));
+		lblEquipe.setHorizontalAlignment(SwingConstants.CENTER);
+		lblEquipe.setFont(new Font("tahoma", Font.BOLD, 18));
+		final JPanel painelCentro = new JPanel(new BorderLayout());
+		painelCentro.add(lblEquipe, BorderLayout.CENTER);
 
-        refreshDatabaseTree();
+		menuBar.add(painelCentro);
 
-        DatabaseManager.INSTANCE.setListener(new DatabaseManagerListener() {
+		refreshDatabaseTree();
 
-            @Override
-            public void onRefreshDatabases() {
-                refreshDatabaseTree();
+		DatabaseManager.INSTANCE.setListener(new DatabaseManagerListener() {
 
-            }
-        });
+			@Override
+			public void onRefreshDatabases() {
+				refreshDatabaseTree();
 
-        principal.add(menuBar, BorderLayout.NORTH);
-        principal.add(splitHorizontal, BorderLayout.CENTER);
+			}
+		});
 
-        getContentPane().add(principal, BorderLayout.CENTER);
+		principal.add(menuBar, BorderLayout.NORTH);
+		principal.add(splitHorizontal, BorderLayout.CENTER);
 
-        setMinimumSize(new Dimension(800, 600));
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setExtendedState(MAXIMIZED_BOTH);
-        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        splitVertical.setDividerLocation(screenSize.height - 350);
-        splitHorizontal.setDividerLocation(screenSize.width / 6);
-        setVisible(true);
+		getContentPane().add(principal, BorderLayout.CENTER);
 
-    }
+		setMinimumSize(new Dimension(800, 600));
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setExtendedState(MAXIMIZED_BOTH);
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		splitVertical.setDividerLocation(screenSize.height - 350);
+		splitHorizontal.setDividerLocation(screenSize.width / 6);
+		setVisible(true);
 
-    private void updateCommandList() {
-        if (commandList.isEmpty() || !commandList.getLast().equals(txtSql.getText())) {
-            commandList.addLast(txtSql.getText());
-            if (commandList.size() > COMMAND_LIST_MAX_SIZE) {
-                commandList.removeFirst();
-            }
-            actualCommandIndex = (byte) (commandList.size() - 1);
-        }
-    }
+	}
 
-    private void nextCommand() {
-        if (!commandList.isEmpty()) {
-            if (actualCommandIndex < commandList.size() - 1) {
-                actualCommandIndex++;
-                txtSql.setText(commandList.get(actualCommandIndex));
-            }
-        }
-    }
+	private void updateCommandList() {
+		if (commandList.isEmpty() || !commandList.getLast().equals(txtSql.getText())) {
+			commandList.addLast(txtSql.getText());
+			if (commandList.size() > COMMAND_LIST_MAX_SIZE) {
+				commandList.removeFirst();
+			}
+			actualCommandIndex = (byte) (commandList.size() - 1);
+		}
+	}
 
-    private void priorCommand() {
-        if (!commandList.isEmpty()) {
-            if (actualCommandIndex > 0) {
-                actualCommandIndex--;
-                txtSql.setText(commandList.get(actualCommandIndex));
-            }
-        }
-    }
+	private void nextCommand() {
+		if (!commandList.isEmpty()) {
+			if (actualCommandIndex < commandList.size() - 1) {
+				actualCommandIndex++;
+				txtSql.setText(commandList.get(actualCommandIndex));
+			}
+		}
+	}
 
-    private void updateStatusBar(long timeTook, int lines) {
-        final JLabel txtInfo = new JLabel(String.format("Tempo total: %sms             %s linha(s)", timeTook, lines));
-        txtInfo.setIcon(new ImageIcon("src/main/java/img/tempoTotal.png")); // TODO trocar para pegar do resource as stream
-        toolBar.removeAll();
-        toolBar.add(txtInfo);// TODO fazer update ser um método
-        toolBar.validate();
-    }
+	private void priorCommand() {
+		if (!commandList.isEmpty()) {
+			if (actualCommandIndex > 0) {
+				actualCommandIndex--;
+				txtSql.setText(commandList.get(actualCommandIndex));
+			}
+		}
+	}
 
-    /**
-     * 
-     */
-    private void refreshDatabaseTree() {
-        ((DefaultMutableTreeNode) treeModel.getRoot()).removeAllChildren();
-        Map<String, IDatabaseDef> databases = DatabaseManager.INSTANCE.getDatabases();
-        for (Entry<String, IDatabaseDef> entry : databases.entrySet()) {
-            String treeText = entry.getKey();
-            if (DatabaseManager.INSTANCE.getActualDatabase() == entry.getValue()) {
-                treeText += " (ATIVO)";
-            }
-            DefaultMutableTreeNode databaseNode = addElementOnRoot(treeText, true);
-            for (Entry<String, ITableDef> table : entry.getValue().getTables().entrySet()) {
-                DefaultMutableTreeNode tableNode = addElementOnTree(table.getKey(), databaseNode);
-                for (IColumnDef column : table.getValue().getColumns()) {
-                    addElementOnTree(column.getName() + " : " + column.getDataType() + (column.getDataType() != DataType.INTEGER ? "(" + column.getCapacity() + ")" : ""), tableNode);
-                }
-            }
-        }
-        treeModel.nodeStructureChanged((DefaultMutableTreeNode) treeModel.getRoot());
-    }
+	private void updateStatusBar(long timeTook, int lines) {
+		final JLabel txtInfo = new JLabel(String.format("Tempo total: %sms             %s linha(s)", timeTook, lines));
+		txtInfo.setIcon(new ImageIcon("src/main/java/img/tempoTotal.png")); // TODO
+																			// trocar
+																			// para
+																			// pegar
+																			// do
+																			// resource
+																			// as
+																			// stream
+		toolBar.removeAll();
+		toolBar.add(txtInfo);// TODO fazer update ser um método
+		toolBar.validate();
+	}
 
-    private void refreshResultConsole(CommandResult commandResult) {
-        resultTable.setModel(new ResultTableModel(commandResult));
-    }
+	/**
+	 * 
+	 */
+	private void refreshDatabaseTree() {
+		((DefaultMutableTreeNode) treeModel.getRoot()).removeAllChildren();
+		Map<String, IDatabaseDef> databases = DatabaseManager.INSTANCE.getDatabases();
+		for (Entry<String, IDatabaseDef> entry : databases.entrySet()) {
+			String treeText = entry.getKey();
+			if (DatabaseManager.INSTANCE.getActualDatabase() == entry.getValue()) {
+				treeText += " (ATIVO)";
+			}
+			DefaultMutableTreeNode databaseNode = addElementOnRoot(treeText, true);
+			for (Entry<String, ITableDef> table : entry.getValue().getTables().entrySet()) {
+				DefaultMutableTreeNode tableNode = addElementOnTree(table.getKey(), databaseNode);
+				for (IColumnDef column : table.getValue().getColumns()) {
+					addElementOnTree(column.getName() + " : " + column.getDataType()
+							+ (column.getDataType() != DataType.INTEGER ? "(" + column.getCapacity() + ")" : ""),
+							tableNode);
+				}
+			}
+		}
+		treeModel.nodeStructureChanged((DefaultMutableTreeNode) treeModel.getRoot());
+	}
 
-    public static void main(String[] args) {
-        new SGBDView();
-    }
+	private void refreshResultConsole(CommandResult commandResult) {
+		resultTable.setModel(new ResultTableModel(commandResult));
+	}
 
-    public DefaultMutableTreeNode addElementOnRoot(String elemento, boolean permiteArquivosFilhos) {
-        final DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
-        return addElementOnTree(elemento, root);
-    }
+	public static void main(String[] args) {
+		new SGBDView();
+	}
 
-    public DefaultMutableTreeNode addElementOnTree(String nodeName, DefaultMutableTreeNode node) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(nodeName, true);
-        node.add(newNode);
-        return newNode;
-    }
+	public DefaultMutableTreeNode addElementOnRoot(String elemento, boolean permiteArquivosFilhos) {
+		final DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
+		return addElementOnTree(elemento, root);
+	}
 
-    private class DatabaseTreeCustomRenderer extends DefaultTreeCellRenderer {
+	public DefaultMutableTreeNode addElementOnTree(String nodeName, DefaultMutableTreeNode node) {
+		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(nodeName, true);
+		node.add(newNode);
+		return newNode;
+	}
 
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean exp, boolean leaf, int row, boolean hasFocus) {
-            super.getTreeCellRendererComponent(tree, value, sel, exp, leaf, row, hasFocus);
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            if (((String) node.getUserObject()).endsWith("(ATIVO)")) {
-                setForeground(Color.GREEN);
-            }
-            return this;
-        }
-    }
+	private class DatabaseTreeCustomRenderer extends DefaultTreeCellRenderer {
+
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean exp, boolean leaf,
+				int row, boolean hasFocus) {
+			super.getTreeCellRendererComponent(tree, value, sel, exp, leaf, row, hasFocus);
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+			if (((String) node.getUserObject()).endsWith("(ATIVO)")) {
+				setForeground(Color.GREEN);
+			}
+			return this;
+		}
+	}
 
 }

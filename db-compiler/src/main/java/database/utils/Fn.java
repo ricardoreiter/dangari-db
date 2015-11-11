@@ -2,6 +2,7 @@ package database.utils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class Fn {
@@ -22,14 +23,14 @@ public final class Fn {
 		return map;
 	}
 
-	public static <V> void apply(Function<V, ?> predicate, V[] array) {
+	public static <V> void apply(Consumer<V> consumer, V[] array) {
 		if (array == null) {
 			return;
 		}
 
 		for (V v : array) {
 			if (v != null) {
-				predicate.apply(v);
+				consumer.accept(v);
 			}
 		}
 	}
