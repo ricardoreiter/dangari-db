@@ -99,6 +99,10 @@ public class JoinUtils {
             runRegistryComparators(actualRegistry, tableList[currentTable].tableComparators, actualComparatorsResult);
             runJoinComparators(newRegistry, tableList[currentTable].joinConditions, actualComparatorsResult);
 
+            if (!isTrue(logicalComparators, actualComparatorsResult)) {
+                continue;
+            }
+
             validRegistrys.addAll(checkTable(logicalComparators, currentTable + 1, tableList, actualComparatorsResult, newRegistry));
         }
         return validRegistrys;
