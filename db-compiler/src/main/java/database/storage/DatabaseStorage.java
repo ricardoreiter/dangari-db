@@ -15,118 +15,125 @@ import database.utils.Pair;
 
 public class DatabaseStorage {
 
-    public static void insertRecord(File file, ITableDef tableDef, Map<IColumnDef, String> columnValue) {
-        byte[] buffer = getRecordBuffer(tableDef);
+	public static void insertRecord(File file, ITableDef tableDef, Map<IColumnDef, String> columnValue) {
+		byte[] buffer = getRecordBuffer(tableDef);
 
-        List<IColumnDef> columns = tableDef.getColumns();
-        writeRecord(buffer, columns, columnValue);
+		List<IColumnDef> columns = tableDef.getColumns();
+		writeRecord(buffer, columns, columnValue);
 
-        File data = getTableDatFile(file);
-        persistRecord(data, buffer);
+		File data = getTableDatFile(file);
+		persistRecord(data, buffer);
 
-        tableDef.incrementRowsCount();
+		int index = tableDef.getRowsCount();
 
-        DefStorage.updateRowsCount(file, tableDef);
-    }
+		for (IColumnDef iColumnDef : columns) {
+			final String value = columnValue.get(iColumnDef);
+			DefStorage.updateIndex(file, iColumnDef, value, index);
+		}
 
-    public static Result getRecords(File file, ITableDef tableDef) {
-        int recordSize = getRecordSize(tableDef);
+		tableDef.incrementRowsCount();
 
-        int recordsCount = tableDef.getRowsCount();
+		DefStorage.updateRowsCount(file, tableDef);
+	}
 
-        int bufferSize = recordSize * recordsCount;
-        byte[] buffer = new byte[bufferSize];
+	public static Result getRecords(File file, ITableDef tableDef) {
+		int recordSize = getRecordSize(tableDef);
 
-        File data = getTableDatFile(file);
-        try (FileInputStream input = new FileInputStream(data)) {
-            input.read(buffer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+		int recordsCount = tableDef.getRowsCount();
 
-        return new Result(buffer, recordSize, createMapOffset(tableDef));
-    }
+		int bufferSize = recordSize * recordsCount;
+		byte[] buffer = new byte[bufferSize];
 
-    private static void persistRecord(File table, byte[] recordBuffer) {
-        try (FileOutputStream out = new FileOutputStream(table, true)) {
-            out.write(recordBuffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		File data = getTableDatFile(file);
+		try (FileInputStream input = new FileInputStream(data)) {
+			input.read(buffer);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    private static byte[] getRecordBuffer(ITableDef tableDef) {
-        return new byte[getRecordSize(tableDef)];
-    }
+		return new Result(buffer, recordSize, createMapOffset(tableDef));
+	}
 
-    private static void writeRecord(byte[] buffer, List<IColumnDef> columns, Map<IColumnDef, String> columnValue) {
-        for (int i = 0, offset = 0; i < columns.size(); i++) {
-            IColumnDef column = columns.get(i);
+	private static void persistRecord(File table, byte[] recordBuffer) {
+		try (FileOutputStream out = new FileOutputStream(table, true)) {
+			out.write(recordBuffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-            int size = getColumnSize(column);
-            if (columnValue.containsKey(column)) {
-                String value = columnValue.get(column);
+	private static byte[] getRecordBuffer(ITableDef tableDef) {
+		return new byte[getRecordSize(tableDef)];
+	}
 
-                DataType type = column.getDataType();
-                if (type == DataType.INTEGER) {
-                    int intValue = Integer.parseInt(value);
-                    DataUtils.writeInt(intValue, buffer, offset);
-                } else {
-                    String strValue = value;
-                    DataUtils.writeString(strValue, size, buffer, offset);
-                }
+	private static void writeRecord(byte[] buffer, List<IColumnDef> columns, Map<IColumnDef, String> columnValue) {
+		for (int i = 0, offset = 0; i < columns.size(); i++) {
+			IColumnDef column = columns.get(i);
 
-            }
-            offset += size;
-        }
-    }
+			int size = getColumnSize(column);
+			if (columnValue.containsKey(column)) {
+				String value = columnValue.get(column);
 
-    private static int getRecordSize(ITableDef tableDef) {
-        int size = 0;
-        List<IColumnDef> columns = tableDef.getColumns();
+				DataType type = column.getDataType();
+				if (type == DataType.INTEGER) {
+					int intValue = Integer.parseInt(value);
+					DataUtils.writeInt(intValue, buffer, offset);
+				} else {
+					String strValue = value;
+					DataUtils.writeString(strValue, size, buffer, offset);
+				}
 
-        for (IColumnDef iColumnDef : columns) {
-            int columnSize = getColumnSize(iColumnDef);
-            size += columnSize;
-        }
+			}
+			offset += size;
+		}
+	}
 
-        return size;
-    }
+	private static int getRecordSize(ITableDef tableDef) {
+		int size = 0;
+		List<IColumnDef> columns = tableDef.getColumns();
 
-    private static int getColumnSize(IColumnDef columnDef) {
-        DataType dataType = columnDef.getDataType();
+		for (IColumnDef iColumnDef : columns) {
+			int columnSize = getColumnSize(iColumnDef);
+			size += columnSize;
+		}
 
-        if (dataType == DataType.INTEGER) {
-            return 4;
-        } else if (dataType == DataType.CHAR || dataType == DataType.VARCHAR) {
-            return columnDef.getCapacity() * DataUtils.STR_BYTES;
-        }
+		return size;
+	}
 
-        throw new RuntimeException(String.format("DataType inválido para a coluna %s", columnDef.getName()));
-    }
+	private static int getColumnSize(IColumnDef columnDef) {
+		DataType dataType = columnDef.getDataType();
 
-    private static Map<IColumnDef, Pair<Integer, Integer>> createMapOffset(ITableDef tableDef) {
-        Map<IColumnDef, Pair<Integer, Integer>> result = new HashMap<>();
+		if (dataType == DataType.INTEGER) {
+			return 4;
+		} else if (dataType == DataType.CHAR || dataType == DataType.VARCHAR) {
+			return columnDef.getCapacity() * DataUtils.STR_BYTES;
+		}
 
-        List<IColumnDef> columns = tableDef.getColumns();
-        for (int i = 0, offset = 0; i < columns.size(); i++) {
-            IColumnDef def = columns.get(i);
+		throw new RuntimeException(String.format("DataType inválido para a coluna %s", columnDef.getName()));
+	}
 
-            int columnSize = getColumnSize(def);
-            result.put(def, new Pair<Integer, Integer>(offset, columnSize));
-            offset += columnSize;
-        }
+	private static Map<IColumnDef, Pair<Integer, Integer>> createMapOffset(ITableDef tableDef) {
+		Map<IColumnDef, Pair<Integer, Integer>> result = new HashMap<>();
 
-        return result;
-    }
+		List<IColumnDef> columns = tableDef.getColumns();
+		for (int i = 0, offset = 0; i < columns.size(); i++) {
+			IColumnDef def = columns.get(i);
 
-    private static File getTableDatFile(File file) {
-        for (File inner : file.listFiles()) {
-            if (inner.getName().endsWith(".dat")) {
-                return inner;
-            }
-        }
-        throw new RuntimeException(String.format("TableDef não encontrado para a tabela %s", file.getName()));
-    }
+			int columnSize = getColumnSize(def);
+			result.put(def, new Pair<Integer, Integer>(offset, columnSize));
+			offset += columnSize;
+		}
+
+		return result;
+	}
+
+	private static File getTableDatFile(File file) {
+		for (File inner : file.listFiles()) {
+			if (inner.getName().endsWith(".dat")) {
+				return inner;
+			}
+		}
+		throw new RuntimeException(String.format("TableDef não encontrado para a tabela %s", file.getName()));
+	}
 
 }
