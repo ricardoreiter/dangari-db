@@ -15,6 +15,7 @@ import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
 import database.storage.DatabaseStorage;
+import database.storage.DefStorage;
 import database.storage.Result;
 import database.utils.JoinUtils;
 import database.utils.JoinUtils.IRegistry;
@@ -110,6 +111,13 @@ public class DatabaseDef implements IDatabaseDef {
         fileTable.delete();
         tables.remove(tableDef);
         tablesByName.remove(tableDef.getName());
+    }
+
+    @Override
+    public Index createIndex(ITableDef tableDef, IColumnDef column) {
+        File fileTable = tables.get(tableDef);
+        DefStorage.createIndex(fileTable, column);
+        return DefStorage.getIndex(fileTable, column);
     }
 
 }

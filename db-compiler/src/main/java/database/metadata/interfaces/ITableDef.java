@@ -2,32 +2,40 @@ package database.metadata.interfaces;
 
 import java.util.List;
 
+import database.metadata.Index;
+
 public interface ITableDef {
 
-	String getName();
+    String getName();
 
-	void setName(String name);
+    void setName(String name);
 
-	int getColumnsCount();
+    int getColumnsCount();
 
-	int getRowsCount();
+    int getRowsCount();
 
-	/**
-	 * rowsCount++
-	 */
-	void incrementRowsCount();
+    /**
+     * rowsCount++
+     */
+    void incrementRowsCount();
 
-	/**
-	 * rowsCount--
-	 */
-	void decrementRowsCount();
+    /**
+     * rowsCount--
+     */
+    void decrementRowsCount();
 
-	IColumnDef getColumnDef(String column);
+    IColumnDef getColumnDef(String column);
 
-	void addColumnDef(IColumnDef column);
+    void addColumnDef(IColumnDef column);
 
-	List<IColumnDef> getColumns();
+    List<IColumnDef> getColumns();
 
-	void deleteColumnDef(String name);
+    void deleteColumnDef(String name);
+
+    Index getIndex(IColumnDef columnDef);
+
+    void addIndex(IColumnDef columnDef, Index index);
+
+    void deleteIndex(IColumnDef columnDef);
 
 }

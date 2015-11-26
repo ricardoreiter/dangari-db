@@ -12,6 +12,7 @@ import java.util.Map;
 
 import database.metadata.ColumnDef;
 import database.metadata.DataType;
+import database.metadata.Index;
 import database.metadata.TableDef;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
@@ -116,6 +117,14 @@ public class DatabaseMock implements IDatabaseDef {
     public void removeTable(ITableDef tableDef) {
         // TODO Auto-generated method stub
 
+    }
+
+    /* (non-Javadoc)
+     * @see database.metadata.interfaces.IDatabaseDef#createIndex(database.metadata.interfaces.ITableDef, database.metadata.interfaces.IColumnDef)
+     */
+    @Override
+    public Index createIndex(ITableDef tableDef, IColumnDef column) {
+        return new Index();
     }
 
 }

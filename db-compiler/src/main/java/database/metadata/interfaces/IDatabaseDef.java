@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import database.metadata.DataType;
+import database.metadata.Index;
 import database.utils.JoinUtils.IRegistry;
 
 /**
@@ -43,5 +44,7 @@ public interface IDatabaseDef {
      * @param tableDef
      */
     void removeTable(ITableDef tableDef);
+
+    Index createIndex(ITableDef tableDef, IColumnDef column);
 
 }
