@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import database.metadata.DatabaseDef;
+import database.metadata.Index;
+import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
+import database.metadata.interfaces.ITableDef;
 import database.storage.DefStorage;
 import database.storage.FileManager;
 
@@ -28,7 +31,14 @@ public final class DatabaseManager {
             DatabaseDef databaseDef = new DatabaseDef(key);
             File[] tablesFiles = FileManager.getTablesBy(key);
             for (int i = 0; i < tablesFiles.length; i++) {
-                databaseDef.addTable(DefStorage.getTableDef(tablesFiles[i]), tablesFiles[i]);
+                ITableDef tableDef = DefStorage.getTableDef(tablesFiles[i]);
+                for (IColumnDef columnDef : tableDef.getColumns()) {
+                    Index index = DefStorage.getIndex(tablesFiles[i], columnDef);
+                    if (index != null) {
+                        tableDef.addIndex(columnDef, index);
+                    }
+                }
+                databaseDef.addTable(tableDef, tablesFiles[i]);
             }
             addDatabase(key, databaseDef);
         }
