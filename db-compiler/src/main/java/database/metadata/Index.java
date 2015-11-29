@@ -3,21 +3,21 @@ package database.metadata;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class Index implements Serializable {
 
-	private class IndexEntry implements Comparable<Object> {
+	private class IndexEntry implements Comparable<IndexEntry> {
 
 		public Object value;
-		public Set<Integer> indexes = new TreeSet<Integer>();
+		public Set<Integer> indexes = new HashSet<Integer>();
 		
+		@SuppressWarnings("unchecked")
 		@Override
-		public int compareTo(Object o) {
-			return ((Comparable<Object>) value).compareTo(o);
+		public int compareTo(IndexEntry ie) {
+			return ((Comparable<Object>) value).compareTo(ie.value);
 		}
 		
 	}
@@ -30,11 +30,17 @@ public class Index implements Serializable {
 	private final ArrayList<IndexEntry> values = new ArrayList<>();
 
 	public Set<Integer> get(final Object value) {
-		int index = Collections.binarySearch(values, value);
+		int index = binarySearch(value);
 		if (index >= 0) {
 			return values.get(index).indexes;
 		}
-		return new TreeSet<>();
+		return new HashSet<>();
+	}
+
+	private int binarySearch(final Object value) {
+		IndexEntry index = new IndexEntry();
+		index.value = value;
+		return Collections.binarySearch(values, index);
 	}
 	
 	public Set<Integer> getIndexesEquals(final Object value) {
@@ -42,7 +48,7 @@ public class Index implements Serializable {
 	}
 	
 	public Set<Integer> getIndexesNotEquals(final Object value) {
-		int index = Collections.binarySearch(values, value);
+		int index = binarySearch(value);
 		Set<Integer> indexes = new TreeSet<Integer>();
 		for (int i = 0; i < values.size(); i++) {
 			if (i == index) {
@@ -72,8 +78,13 @@ public class Index implements Serializable {
 	private Set<Integer> internalGetIndexesLess(final Object value, boolean inclusive) {
 		Set<Integer> indexes = new TreeSet<Integer>();
 		
-		int index = Collections.binarySearch(values, value);
-		int finalIndex = (index >= 0) ? ((inclusive) ? index + 1 : index) : values.size();
+		int index = binarySearch(value);
+		int finalIndex;
+		if (inclusive) {
+			finalIndex = (index >= 0) ? index + 1 : (index * -1) - 1;
+		} else {
+			finalIndex = (index >= 0) ? index : (index * -1);
+		}
 		for (int i = 0; i < finalIndex; i++) {
 			indexes.addAll(values.get(i).indexes);
 		}
@@ -83,8 +94,16 @@ public class Index implements Serializable {
 	private Set<Integer> internalGetIndexesGreater(final Object value, boolean inclusive) {
 		Set<Integer> indexes = new TreeSet<Integer>();
 		
-		int index = Collections.binarySearch(values, value);
-		int initialIndex = (index >= 0) ? ((inclusive) ? index : index + 1) : 0;
+		int index = binarySearch(value);
+		if (index == -values.size()) {
+			return Collections.emptySet();
+		}
+		int initialIndex;
+		if (inclusive) {
+			initialIndex = (index >= 0) ? index : (index * -1);
+		} else {
+			initialIndex = (index >= 0) ? index + 1 : (index * -1)- 1;
+		}
 		for (int i = initialIndex; i < values.size(); i++) {
 			indexes.addAll(values.get(i).indexes);
 		}
