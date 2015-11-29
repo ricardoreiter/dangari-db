@@ -1,5 +1,8 @@
 package database.utils;
 
+import java.util.Set;
+
+import database.metadata.Index;
 import database.metadata.interfaces.IColumnDef;
 
 public class GreaterValueComparator extends AbstractValueComparator {
@@ -20,6 +23,11 @@ public class GreaterValueComparator extends AbstractValueComparator {
     @Override
     public boolean isValid(Object valueA, Object valueB) {
         return ((Comparable<Object>) valueA).compareTo(valueB) > 0;
+    }
+    
+    @Override
+    public Set<Integer> getIndexes(Index index, Object value) {
+    	return index.getIndexesGreater(value);
     }
 
 }
