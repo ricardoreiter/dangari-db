@@ -81,9 +81,9 @@ public class Index implements Serializable {
 		int index = binarySearch(value);
 		int finalIndex;
 		if (inclusive) {
-			finalIndex = (index >= 0) ? index + 1 : (index * -1);
+			finalIndex = (index >= 0) ? index + 1 : (index * -1) -1;
 		} else {
-			finalIndex = (index >= 0) ? index : (index * -1);
+			finalIndex = (index >= 0) ? index : (index * -1) - 1;
 		}
 		for (int i = 0; i < finalIndex; i++) {
 			indexes.addAll(values.get(i).indexes);

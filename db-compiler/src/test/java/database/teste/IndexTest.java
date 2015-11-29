@@ -5,8 +5,6 @@
  */
 package database.teste;
 
-import java.util.Set;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -189,6 +187,127 @@ public class IndexTest {
     	Assert.assertEquals(2, list.length);
     	
     	list = index.getIndexesGreaterOrEquals(new Integer(52)).toArray();
+    	Assert.assertEquals(0, list.length);
+    }
+    
+    @Test
+    public void testGet_Less_001() {
+    	Index index = createIntIndex();
+    	Object[] list = index.getIndexesLess(new Integer(45)).toArray();
+    	Assert.assertEquals(3, list.length);
+    	Assert.assertEquals(13, list[0]);
+    	Assert.assertEquals(14, list[1]);
+    	Assert.assertEquals(15, list[2]);
+    	
+    	list = index.getIndexesLess(new Integer(12)).toArray();
+    	Assert.assertEquals(3, list.length);
+    	Assert.assertEquals(13, list[0]);
+    	Assert.assertEquals(14, list[1]);
+    	Assert.assertEquals(15, list[2]);
+    	
+    	list = index.getIndexesLess(new Integer(46)).toArray();
+    	Assert.assertEquals(4, list.length);
+    	Assert.assertEquals(7, list[0]);
+    	Assert.assertEquals(13, list[1]);
+    	Assert.assertEquals(14, list[2]);
+    	Assert.assertEquals(15, list[3]);
+    	
+    	list = index.getIndexesLess(new Integer(52)).toArray();
+    	Assert.assertEquals(11, list.length);
+    	Assert.assertEquals(1, list[0]);
+    	Assert.assertEquals(2, list[1]);
+    	Assert.assertEquals(3, list[2]);
+    	Assert.assertEquals(4, list[3]);
+    	Assert.assertEquals(5, list[4]);
+    	Assert.assertEquals(6, list[5]);
+    	Assert.assertEquals(7, list[6]);
+    	Assert.assertEquals(13, list[7]);
+    	Assert.assertEquals(14, list[8]);
+    	Assert.assertEquals(15, list[9]);
+    	Assert.assertEquals(16, list[10]);
+    	
+    	list = index.getIndexesLess(new Integer(51)).toArray();
+    	Assert.assertEquals(9, list.length);
+    	Assert.assertEquals(1, list[0]);
+    	Assert.assertEquals(4, list[1]);
+    	Assert.assertEquals(5, list[2]);
+    	Assert.assertEquals(6, list[3]);
+    	Assert.assertEquals(7, list[4]);
+    	Assert.assertEquals(13, list[5]);
+    	Assert.assertEquals(14, list[6]);
+    	Assert.assertEquals(15, list[7]);
+    	Assert.assertEquals(16, list[8]);
+    }
+    
+    @Test
+    public void testGet_Less_002() {
+    	Index index = createIntIndex();
+    	Object[] list = index.getIndexesLess(new Integer(10)).toArray();
+    	Assert.assertEquals(0, list.length);
+    	
+    	list = index.getIndexesLess(new Integer(8)).toArray();
+    	Assert.assertEquals(0, list.length);
+    }
+    
+    @Test
+    public void testGet_LessOrEquals_001() {
+    	Index index = createIntIndex();
+    	Object[] list = index.getIndexesLessOrEquals(new Integer(45)).toArray();
+    	Assert.assertEquals(4, list.length);
+    	Assert.assertEquals(7, list[0]);
+    	Assert.assertEquals(13, list[1]);
+    	Assert.assertEquals(14, list[2]);
+    	Assert.assertEquals(15, list[3]);
+    	
+    	list = index.getIndexesLessOrEquals(new Integer(12)).toArray();
+    	Assert.assertEquals(3, list.length);
+    	Assert.assertEquals(13, list[0]);
+    	Assert.assertEquals(14, list[1]);
+    	Assert.assertEquals(15, list[2]);
+    	
+    	list = index.getIndexesLessOrEquals(new Integer(46)).toArray();
+    	Assert.assertEquals(4, list.length);
+    	Assert.assertEquals(7, list[0]);
+    	Assert.assertEquals(13, list[1]);
+    	Assert.assertEquals(14, list[2]);
+    	Assert.assertEquals(15, list[3]);
+    	
+    	list = index.getIndexesLessOrEquals(new Integer(52)).toArray();
+    	Assert.assertEquals(11, list.length);
+    	Assert.assertEquals(1, list[0]);
+    	Assert.assertEquals(2, list[1]);
+    	Assert.assertEquals(3, list[2]);
+    	Assert.assertEquals(4, list[3]);
+    	Assert.assertEquals(5, list[4]);
+    	Assert.assertEquals(6, list[5]);
+    	Assert.assertEquals(7, list[6]);
+    	Assert.assertEquals(13, list[7]);
+    	Assert.assertEquals(14, list[8]);
+    	Assert.assertEquals(15, list[9]);
+    	Assert.assertEquals(16, list[10]);
+    	
+    	list = index.getIndexesLessOrEquals(new Integer(51)).toArray();
+    	Assert.assertEquals(11, list.length);
+    	Assert.assertEquals(1, list[0]);
+    	Assert.assertEquals(2, list[1]);
+    	Assert.assertEquals(3, list[2]);
+    	Assert.assertEquals(4, list[3]);
+    	Assert.assertEquals(5, list[4]);
+    	Assert.assertEquals(6, list[5]);
+    	Assert.assertEquals(7, list[6]);
+    	Assert.assertEquals(13, list[7]);
+    	Assert.assertEquals(14, list[8]);
+    	Assert.assertEquals(15, list[9]);
+    	Assert.assertEquals(16, list[10]);
+    }
+    
+    @Test
+    public void testGet_LessOrEquals_002() {
+    	Index index = createIntIndex();
+    	Object[] list = index.getIndexesLessOrEquals(new Integer(10)).toArray();
+    	Assert.assertEquals(3, list.length);
+    	
+    	list = index.getIndexesLessOrEquals(new Integer(8)).toArray();
     	Assert.assertEquals(0, list.length);
     }
     
