@@ -23,6 +23,7 @@ public class CreateIndexCommandExecutor implements ICommandExecutor {
         for (IColumnDef columnDef : columns) {
             table.addIndex(columnDef, database.createIndex(table, columnDef));
         }
+        DatabaseManager.INSTANCE.refreshDatabase();
         CommandResult commandResult = new CommandResult();
         commandResult.addColumn("Info");
         commandResult.addValue("Info", String.format("[%s] índices criados na tabela [%s].", columns.size(), table.getName()));

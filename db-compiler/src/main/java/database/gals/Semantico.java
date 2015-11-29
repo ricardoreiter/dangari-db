@@ -6,6 +6,7 @@ import java.util.List;
 import database.command.ICommandExecutor;
 import database.command.compiler.AlterDatabaseCommandCompiler;
 import database.command.compiler.CreateDatabaseCommandCompiler;
+import database.command.compiler.CreateIndexCommandCompiler;
 import database.command.compiler.CreateTableCommandCompiler;
 import database.command.compiler.DescribeTableCommandCompiler;
 import database.command.compiler.DropTableCommandCompiler;
@@ -39,6 +40,9 @@ public class Semantico implements Constants {
                 compiler = new CreateTableCommandCompiler();
                 compiler.accept(action, token);
                 break;
+            case 22:
+            	compiler = new CreateIndexCommandCompiler();
+            	compiler.accept(action, token);
             case 30:
                 if (compiler == null) {
                     compiler = new InsertCommandCompiler();

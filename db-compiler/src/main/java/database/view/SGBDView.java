@@ -283,7 +283,8 @@ public class SGBDView extends JFrame {
 				DefaultMutableTreeNode tableNode = addElementOnTree(table.getKey(), databaseNode);
 				for (IColumnDef column : table.getValue().getColumns()) {
 					addElementOnTree(column.getName() + " : " + column.getDataType()
-							+ (column.getDataType() != DataType.INTEGER ? "(" + column.getCapacity() + ")" : ""),
+							+ (column.getDataType() != DataType.INTEGER ? "(" + column.getCapacity() + ")" : "")
+							+ (table.getValue().getIndex(column) != null ? " - INDEXED" : ""),
 							tableNode);
 				}
 			}

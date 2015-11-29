@@ -34,15 +34,16 @@ public class DefStorage {
 		return readTableDef(def);
 	}
 
-	public static void createIndex(final File table, final IColumnDef columnDef) {
+	public static void createIndex(final File table, final ITableDef tableDef, final IColumnDef columnDef) {
 
 		final String columnName = columnDef.getName();
 
 		FileManager.createIndex(table, columnName);
+		
+		Index index = new Index();
+		setIndex(table, columnDef, index);
 
-		final Index index = getIndex(table, columnDef);
-
-		bindIndex(table, columnDef, index);
+		bindIndex(table, tableDef, columnDef, index);
 
 		setIndex(table, columnDef, index);
 	}
@@ -58,9 +59,7 @@ public class DefStorage {
 		setIndex(table, columnDef, objIndex);
 	}
 
-	private static void bindIndex(final File table, final IColumnDef columnDef, final Index index) {
-		ITableDef tableDef = getTableDef(table);
-
+	private static void bindIndex(final File table, final ITableDef tableDef, final IColumnDef columnDef, final Index index) {
 		Result records = DatabaseStorage.getRecords(table, tableDef);
 
 		for (int i = 0; i < tableDef.getRowsCount(); i++) {

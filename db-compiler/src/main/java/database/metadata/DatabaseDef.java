@@ -116,7 +116,7 @@ public class DatabaseDef implements IDatabaseDef {
     @Override
     public Index createIndex(ITableDef tableDef, IColumnDef column) {
         File fileTable = tables.get(tableDef);
-        DefStorage.createIndex(fileTable, column);
+        DefStorage.createIndex(fileTable, tableDef, column);
         return DefStorage.getIndex(fileTable, column);
     }
 
