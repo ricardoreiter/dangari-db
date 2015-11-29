@@ -11,7 +11,8 @@ import org.junit.runners.Suite.SuiteClasses;
 				DefinitionTest.class,
 				FileManagerTest.class,
 				IntegrationTest.class, 
-				JoinUtilsTest.class })
+				JoinUtilsTest.class,
+				IndexTest.class })
 public class AllTests {
 
 }
