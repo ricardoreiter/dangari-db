@@ -17,11 +17,13 @@ public class DescribeTableCommandExecutor implements ICommandExecutor {
         commandResult.addColumn("Nome da Coluna");
         commandResult.addColumn("Tipo");
         commandResult.addColumn("Tamanho");
+        commandResult.addColumn("Registros");
 
         for (IColumnDef column : tableDef.getColumns()) {
             commandResult.addValue("Nome da Coluna", column.getName());
             commandResult.addValue("Tipo", column.getDataType().toString());
             commandResult.addValue("Tamanho", String.valueOf(column.getCapacity()));
+            commandResult.addValue("Registros", String.valueOf(tableDef.getRowsCount()));
         }
 
         return commandResult;
