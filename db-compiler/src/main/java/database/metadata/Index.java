@@ -1,41 +1,51 @@
 package database.metadata;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class Index implements Serializable {
 
+	private class IndexEntry implements Comparable<Object> {
+
+		public Object value;
+		public Set<Integer> indexes;
+		
+		@Override
+		public int compareTo(Object o) {
+			return ((Comparable<Object>) value).compareTo(o);
+		}
+		
+	}
+	
 	/**
 	 * Serial Version
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private final Map<String, Set<Integer>> indexes = new HashMap<>();
+	private final ArrayList<IndexEntry> values = new ArrayList<>();
 
 	public Set<Integer> get(final Object value) {
-		final String strValue = value.toString();
-		if (indexes.containsKey(strValue)) {
-			return indexes.get(strValue);
+		int index = Collections.binarySearch(values, value);
+		if (index >= 0) {
+			return values.get(index).indexes;
 		}
 		return Collections.emptySet();
 	}
 
 	public void put(final Object key, final Integer index) {
-		final String strKey = key.toString();
-
-		final Set<Integer> values;
-		if (indexes.containsKey(strKey)) {
-			values = indexes.get(strKey);
-		} else {
-			values = new TreeSet<>();
-			indexes.put(strKey, values);
+		Set<Integer> indexes = get(key);
+		
+		indexes.add(index);
+		
+		if (indexes.size() == 1) {
+			IndexEntry entry = new IndexEntry();
+			entry.value = key;
+			entry.indexes = indexes;
+			values.add(entry);
+			Collections.sort(values);
 		}
-
-		values.add(index);
 	}
 
 }
