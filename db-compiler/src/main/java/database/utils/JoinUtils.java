@@ -135,7 +135,8 @@ public class JoinUtils {
         if (tableJoinRegistry.tableComparators != null) {
             for (AbstractValueComparator actualComparator : tableJoinRegistry.tableComparators) {
                 Index index = tableJoinRegistry.tableDef.getIndex(actualComparator.getColumnLeft());
-                if (index == null) {
+                // Se não tiver índice e for tabelaA.campoA = tabelaA.campoB, então não temos como otimizar... adiciona todos os registros...
+                if (index == null || actualComparator.getColumnRight() != null) {
                     addAll = true;
                     break;
                 }
@@ -144,7 +145,7 @@ public class JoinUtils {
             }
         }
 
-        if (tableJoinRegistry.joinConditions != null) {
+        if (tableJoinRegistry.joinConditions != null && !addAll) {
             outer: for (Entry<ITableDef, List<AbstractValueComparator>> entry : tableJoinRegistry.joinConditions.entrySet()) {
                 for (AbstractValueComparator comparator : entry.getValue()) {
 
