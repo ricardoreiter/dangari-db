@@ -7,7 +7,9 @@ import java.util.LinkedList;
 
 public class Index implements Serializable {
 
-    public class IndexEntry implements Comparable<IndexEntry> {
+    public class IndexEntry implements Comparable<IndexEntry>, Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         public Object value;
         public LinkedList<Integer> indexes = new LinkedList<Integer>();
