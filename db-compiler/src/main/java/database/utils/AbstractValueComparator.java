@@ -1,6 +1,6 @@
 package database.utils;
 
-import java.util.Set;
+import java.util.LinkedList;
 
 import database.metadata.Index;
 import database.metadata.interfaces.IColumnDef;
@@ -15,8 +15,8 @@ public abstract class AbstractValueComparator {
     public abstract boolean isValid(Object valueRight);
 
     public abstract boolean isValid(Object valueA, Object valueB);
-    
-    public abstract Set<Integer> getIndexes(Index index, Object value);
+
+    public abstract LinkedList<Integer> getIndexes(Index index, Object value);
 
     public AbstractValueComparator(Object constantValue, IColumnDef columnLeft) {
         this.constantValue = constantValue;
