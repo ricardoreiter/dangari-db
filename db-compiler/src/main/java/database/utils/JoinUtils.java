@@ -183,8 +183,13 @@ public class JoinUtils {
     }
 
     private static List<IRegistry> checkLastTable(ArrayList<AbstractBooleanComparator> logicalComparators, TableJoinRegistry table, boolean[] comparatorsResult, IRegistry actualMergedRegistry) {
+        Set<Integer> validIndexesToIterate = getValidIndexes(actualMergedRegistry, table);
+
         List<IRegistry> validRegistrys = new LinkedList<JoinUtils.IRegistry>();
-        for (IRegistry actualRegistry : table.registrys) {
+        List<IRegistry> tableRegistrys = table.registrys;
+        for (Integer actualIndex : validIndexesToIterate) {
+            IRegistry actualRegistry = tableRegistrys.get(actualIndex);
+
             IRegistry newRegistry = new IRegistry();
             newRegistry.mergeWith(actualRegistry);
             newRegistry.mergeWith(actualMergedRegistry);
