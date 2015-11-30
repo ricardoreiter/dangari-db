@@ -6,8 +6,8 @@
 package database.metadata;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +88,7 @@ public class DatabaseDef implements IDatabaseDef {
         File tableFile = tables.get(tableDef);
 
         Result recordsResult = DatabaseStorage.getRecords(tableFile, tableDef);
-        List<IRegistry> listRegistrys = new LinkedList<JoinUtils.IRegistry>();
+        List<IRegistry> listRegistrys = new ArrayList<JoinUtils.IRegistry>(tableDef.getRowsCount());
         for (int i = 0; i < tableDef.getRowsCount(); i++) {
             IRegistry newRegistry = new IRegistry();
 

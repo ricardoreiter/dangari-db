@@ -437,5 +437,6 @@ public class JoinUtilsTest {
         registro.columnValue.put(tableUsuario.tableDef.getColumnDef("cod"), new Integer(cod));
         registro.columnValue.put(tableUsuario.tableDef.getColumnDef("nome"), nome);
         tableUsuario.registrys.add(registro);
+        tableUsuario.tableDef.incrementRowsCount();
     }
 }
