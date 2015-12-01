@@ -19,27 +19,6 @@ import database.utils.JoinUtils.TableJoinRegistry;
 public class SelectCommandExecutor implements ICommandExecutor {
 
     private List<ITableDef> tableList;
-
-    public List<ITableDef> getTableList() {
-        return tableList;
-    }
-
-    public ArrayList<AbstractBooleanComparator> getWhereConditionsLogicalOperators() {
-        return whereConditionsLogicalOperators;
-    }
-
-    public Map<ITableDef, List<AbstractValueComparator>> getTableComparators() {
-        return tableComparators;
-    }
-
-    public Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> getTableJoinComparators() {
-        return tableJoinComparators;
-    }
-
-    public List<IColumnDef> getSelectedColumns() {
-        return selectedColumns;
-    }
-
     private ArrayList<AbstractBooleanComparator> whereConditionsLogicalOperators;
     private Map<ITableDef, List<AbstractValueComparator>> tableComparators;
     private Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators;
@@ -88,6 +67,30 @@ public class SelectCommandExecutor implements ICommandExecutor {
             }
         }
         return commandResult;
+    }
+
+    public Set<ITableDef> getTablesForceLoadAll() {
+        return forceLoadAllTableList;
+    }
+
+    public List<ITableDef> getTableList() {
+        return tableList;
+    }
+
+    public ArrayList<AbstractBooleanComparator> getWhereConditionsLogicalOperators() {
+        return whereConditionsLogicalOperators;
+    }
+
+    public Map<ITableDef, List<AbstractValueComparator>> getTableComparators() {
+        return tableComparators;
+    }
+
+    public Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> getTableJoinComparators() {
+        return tableJoinComparators;
+    }
+
+    public List<IColumnDef> getSelectedColumns() {
+        return selectedColumns;
     }
 
 }
