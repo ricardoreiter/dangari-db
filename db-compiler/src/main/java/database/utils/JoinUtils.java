@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import database.gals.SemanticError;
 import database.metadata.Index;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.ITableDef;
@@ -17,6 +18,7 @@ import database.metadata.interfaces.ITableDef;
 public class JoinUtils {
 
     public static boolean createTemporaryIndex = true;
+    public static int maxRecordCount = 300000;
 
     private static void runRegistryComparators(IRegistry registry, List<AbstractValueComparator> comparators, boolean[] results) {
 
@@ -93,7 +95,7 @@ public class JoinUtils {
 
     }
 
-    public static List<IRegistry> joinTables(ArrayList<AbstractBooleanComparator> logicalComparators, TableJoinRegistry... registries) {
+    public static List<IRegistry> joinTables(ArrayList<AbstractBooleanComparator> logicalComparators, TableJoinRegistry... registries) throws SemanticError {
         List<IRegistry> result = new LinkedList<JoinUtils.IRegistry>();
         boolean[] comparatorsResult = new boolean[logicalComparators.size() + 1];
         Arrays.fill(comparatorsResult, true);
@@ -104,7 +106,7 @@ public class JoinUtils {
         return result;
     }
 
-    private static List<IRegistry> checkTable(ArrayList<AbstractBooleanComparator> logicalComparators, int currentTable, TableJoinRegistry[] tableList, boolean[] comparatorsResult, IRegistry actualMergedRegistry) {
+    private static List<IRegistry> checkTable(ArrayList<AbstractBooleanComparator> logicalComparators, int currentTable, TableJoinRegistry[] tableList, boolean[] comparatorsResult, IRegistry actualMergedRegistry) throws SemanticError {
         if (currentTable == tableList.length - 1) {
             return checkLastTable(logicalComparators, tableList[currentTable], comparatorsResult, actualMergedRegistry);
         }
@@ -128,6 +130,9 @@ public class JoinUtils {
             }
 
             validRegistrys.addAll(checkTable(logicalComparators, currentTable + 1, tableList, actualComparatorsResult, newRegistry));
+            if (validRegistrys.size() > maxRecordCount) {
+                throw new SemanticError("Quantidade de registros retornados maior que " + maxRecordCount + ". Refine seu select.");
+            }
         }
         return validRegistrys;
     }
@@ -158,6 +163,7 @@ public class JoinUtils {
                     // Se não tiver índice e for tabelaA.campoA = tabelaA.campoB, então não temos como otimizar... adiciona todos os registros...
                     if (index == null && createTemporaryIndex && actualComparator.getColumnRight() == null) {
                         index = createTemporaryIndex(actualComparator.getColumnLeft(), tableJoinRegistry.registrys);
+                        tableJoinRegistry.tableDef.addIndex(actualComparator.getColumnLeft(), index);
                     } else if (index == null || actualComparator.getColumnRight() != null) {
                         addAll = true;
                         break;
@@ -176,6 +182,7 @@ public class JoinUtils {
 
                             if (index == null && createTemporaryIndex) {
                                 index = createTemporaryIndex(comparator.getColumnRight(), tableJoinRegistry.registrys);
+                                tableJoinRegistry.tableDef.addIndex(comparator.getColumnRight(), index);
                             } else if (index == null) {
                                 addAll = true;
                                 break outer;
@@ -190,6 +197,7 @@ public class JoinUtils {
 
                             if (index == null && createTemporaryIndex) {
                                 index = createTemporaryIndex(comparator.getColumnLeft(), tableJoinRegistry.registrys);
+                                tableJoinRegistry.tableDef.addIndex(comparator.getColumnLeft(), index);
                             } else if (index == null) {
                                 addAll = true;
                                 break outer;

@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import database.gals.SemanticError;
 import database.metadata.Index;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
@@ -43,7 +44,7 @@ public class JoinUtilsIndexTest extends JoinUtilsTest {
 
     @Test
     @Override
-    public void testJoin001() {
+    public void testJoin001() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");

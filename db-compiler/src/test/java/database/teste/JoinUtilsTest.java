@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import database.gals.SemanticError;
 import database.metadata.interfaces.IDatabaseDef;
 import database.metadata.interfaces.ITableDef;
 import database.utils.AbstractBooleanComparator;
@@ -46,7 +47,7 @@ public class JoinUtilsTest {
     }
 
     @Test
-    public void testJoin001() {
+    public void testJoin001() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");
@@ -132,7 +133,7 @@ public class JoinUtilsTest {
     }
 
     @Test
-    public void testJoin002() {
+    public void testJoin002() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");
@@ -185,7 +186,7 @@ public class JoinUtilsTest {
     }
 
     @Test
-    public void testJoin003() {
+    public void testJoin003() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");
@@ -228,7 +229,7 @@ public class JoinUtilsTest {
     }
 
     @Test
-    public void testJoin005() {
+    public void testJoin005() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");
@@ -285,7 +286,7 @@ public class JoinUtilsTest {
     }
 
     @Test
-    public void testJoin006() {
+    public void testJoin006() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");
@@ -342,7 +343,7 @@ public class JoinUtilsTest {
     }
 
     @Test
-    public void testJoin004() {
+    public void testJoin004() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");
@@ -385,7 +386,7 @@ public class JoinUtilsTest {
     }
 
     @Test
-    public void testJoin007() {
+    public void testJoin007() throws SemanticError {
         IDatabaseDef database = new DatabaseMock();
         ITableDef empresaTableDef = database.getTableDef("empresa");
         ITableDef usuarioTableDef = database.getTableDef("usuario");

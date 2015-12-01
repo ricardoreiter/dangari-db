@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import database.gals.SemanticError;
 import database.manager.DatabaseManager;
 import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.IDatabaseDef;
@@ -58,7 +59,15 @@ public class SelectCommandExecutor implements ICommandExecutor {
             i++;
         }
 
-        List<IRegistry> result = JoinUtils.joinTables(whereConditionsLogicalOperators, tablesJoinRegistry);
+        List<IRegistry> result;
+        try {
+            result = JoinUtils.joinTables(whereConditionsLogicalOperators, tablesJoinRegistry);
+        } catch (SemanticError e) {
+            commandResult = new CommandResult();
+            commandResult.addColumn("Info");
+            commandResult.addValue("Info", e.getMessage());
+            return commandResult;
+        }
         for (IRegistry registry : result) {
             i = 1;
             for (IColumnDef columnDef : selectedColumns) {
