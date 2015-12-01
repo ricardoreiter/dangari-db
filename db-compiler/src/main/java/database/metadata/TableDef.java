@@ -9,7 +9,7 @@ import database.metadata.interfaces.IColumnDef;
 import database.metadata.interfaces.ITableDef;
 import database.utils.Fn;
 
-public class TableDef implements ITableDef {
+public class TableDef implements ITableDef, Comparable<TableDef> {
 
     private String name;
     private int rowsCount;
@@ -120,5 +120,10 @@ public class TableDef implements ITableDef {
     public void deleteIndex(IColumnDef columnDef) {
         columnsIndex.remove(columnDef);
     }
+
+	@Override
+	public int compareTo(TableDef o) {
+		return name.compareTo(o.getName());
+	}
 
 }
