@@ -40,7 +40,7 @@ public class DefStorage {
 
         FileManager.createIndex(table, columnName);
 
-        Index index = new Index();
+        Index index = new Index(tableDef.getRowsCount());
 
         bindIndex(table, tableDef, columnDef, index);
 

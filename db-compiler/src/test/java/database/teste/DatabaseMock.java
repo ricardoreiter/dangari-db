@@ -124,7 +124,7 @@ public class DatabaseMock implements IDatabaseDef {
      */
     @Override
     public Index createIndex(ITableDef tableDef, IColumnDef column) {
-        return new Index();
+        return new Index(10);
     }
 
 }

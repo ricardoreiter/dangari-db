@@ -325,7 +325,7 @@ public class IndexTest {
     //    }
 
     private Index createIntIndex() {
-        Index index = new Index();
+        Index index = new Index(5);
         index.put(50, 1);
         index.put(50, 5);
         index.put(50, 4);

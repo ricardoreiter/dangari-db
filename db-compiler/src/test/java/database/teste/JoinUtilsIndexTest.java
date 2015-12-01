@@ -11,6 +11,8 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import database.metadata.Index;
@@ -22,16 +24,23 @@ import database.utils.AbstractValueComparator;
 import database.utils.AndBooleanComparator;
 import database.utils.GreaterValueComparator;
 import database.utils.JoinUtils;
-import database.utils.NotEqualsValueComparator;
 import database.utils.JoinUtils.IRegistry;
 import database.utils.JoinUtils.TableJoinRegistry;
+import database.utils.NotEqualsValueComparator;
 
 /**
  * @author ricardo.reiter
  */
 public class JoinUtilsIndexTest extends JoinUtilsTest {
 
-	
+    @Before
+    public void beforeTest() {
+    }
+
+    @After
+    public void afterTest() {
+    }
+
     @Test
     @Override
     public void testJoin001() {
@@ -119,33 +128,32 @@ public class JoinUtilsIndexTest extends JoinUtilsTest {
         Assert.assertEquals(null, registrysJoined.get(5).columnValue.get(empresaTableDef.getColumnDef("caractere")));
     }
 
-	
     /**
      * @param tableUsuario
      */
-	@Override
+    @Override
     protected void createRegistry(TableJoinRegistry tableUsuario, int cod, String nome) {
         IRegistry registro = new IRegistry();
-        
+
         IColumnDef codColumn = tableUsuario.tableDef.getColumnDef("cod");
         IColumnDef nomColumn = tableUsuario.tableDef.getColumnDef("nome");
-		registro.columnValue.put(codColumn, new Integer(cod));
-		registro.columnValue.put(nomColumn, nome);
-		
-		Index index = tableUsuario.tableDef.getIndex(codColumn);
-		if (index == null) {
-			index = new Index();
-			tableUsuario.tableDef.addIndex(codColumn, index);
-		}
-		index.put(cod, tableUsuario.tableDef.getRowsCount());
-		
-		index = tableUsuario.tableDef.getIndex(nomColumn);
-		if (index == null) {
-			index = new Index();
-			tableUsuario.tableDef.addIndex(nomColumn, index);
-		}
-		index.put(nome, tableUsuario.tableDef.getRowsCount());
-		
+        registro.columnValue.put(codColumn, new Integer(cod));
+        registro.columnValue.put(nomColumn, nome);
+
+        Index index = tableUsuario.tableDef.getIndex(codColumn);
+        if (index == null) {
+            index = new Index(10);
+            tableUsuario.tableDef.addIndex(codColumn, index);
+        }
+        index.put(cod, tableUsuario.tableDef.getRowsCount());
+
+        index = tableUsuario.tableDef.getIndex(nomColumn);
+        if (index == null) {
+            index = new Index(10);
+            tableUsuario.tableDef.addIndex(nomColumn, index);
+        }
+        index.put(nome, tableUsuario.tableDef.getRowsCount());
+
         tableUsuario.registrys.add(registro);
         tableUsuario.tableDef.incrementRowsCount();
     }

@@ -27,7 +27,11 @@ public class Index implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    private final ArrayList<IndexEntry> values = new ArrayList<>();
+    private final ArrayList<IndexEntry> values;
+
+    public Index(int initialSize) {
+        values = new ArrayList<Index.IndexEntry>(initialSize);
+    }
 
     public ArrayList<IndexEntry> getValues() {
         return values;

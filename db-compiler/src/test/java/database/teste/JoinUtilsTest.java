@@ -11,6 +11,8 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import database.metadata.interfaces.IDatabaseDef;
@@ -32,6 +34,16 @@ import database.utils.NotEqualsValueComparator;
  * @author ricardo.reiter
  */
 public class JoinUtilsTest {
+
+    @Before
+    public void beforeTest() {
+        JoinUtils.createTemporaryIndex = false;
+    }
+
+    @After
+    public void afterTest() {
+        JoinUtils.createTemporaryIndex = true;
+    }
 
     @Test
     public void testJoin001() {

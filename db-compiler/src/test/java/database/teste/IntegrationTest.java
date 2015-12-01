@@ -7,6 +7,7 @@ package database.teste;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,7 @@ import database.gals.Sintatico;
 import database.gals.SyntaticError;
 import database.manager.DatabaseManager;
 import database.storage.FileManager;
+import database.utils.JoinUtils;
 
 /**
  * @author ricardo.reiter
@@ -69,6 +71,7 @@ public class IntegrationTest {
 
     @Before
     public void beforeTest() {
+        JoinUtils.createTemporaryIndex = false;
         if (FileManager.getDatabase("DatabaseTesteIntegration") != null) {
             FileManager.deleteDatabase("DatabaseTesteIntegration");
             DatabaseManager.INSTANCE.getDatabases().remove("DatabaseTesteIntegration");
@@ -78,6 +81,12 @@ public class IntegrationTest {
         compileAndExecute("CREATE TABLE usuario (cod INTEGER, codEmp INTEGER, codCargo INTEGER, nome VARCHAR(50), cpf CHAR(8));");
         compileAndExecute("CREATE TABLE empresa (cod INTEGER, nome VARCHAR(50), uf CHAR(2));");
         compileAndExecute("CREATE TABLE cargo (cod INTEGER, nome VARCHAR(50));");
+
+    }
+
+    @After
+    public void afterTest() {
+        JoinUtils.createTemporaryIndex = true;
     }
 
     @Test
@@ -105,17 +114,17 @@ public class IntegrationTest {
         CommandResult result = compileAndExecute("INSERT INTO usuario (cod, codCargo, nome) values (1, 1, \"Ricardo fodao\");");
         Assert.assertEquals("Registro inserido", result.getValues().get("Info").get(0));
     }
-    
+
     @Test
     public void testInsert_Select001() {
         CommandResult result = compileAndExecute("INSERT INTO usuario (cod, codCargo, nome, cpf) values (1, 1, \"Ricardo fodao\", \"89042100\");");
-     
+
         result = compileAndExecute("SELECT usuario.* FROM usuario;");
 
         List<String> columnCod = result.getValues().get("cod - 1");
         Assert.assertEquals(1, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
-        
+
         List<String> columnCodEmp = result.getValues().get("codEmp - 2");
         Assert.assertEquals(1, columnCodEmp.size());
         Assert.assertEquals("0", columnCodEmp.get(0));
@@ -123,7 +132,7 @@ public class IntegrationTest {
         List<String> columnCodCargo = result.getValues().get("codCargo - 3");
         Assert.assertEquals(1, columnCodCargo.size());
         Assert.assertEquals("1", columnCodCargo.get(0));
-        
+
         List<String> columnNome = result.getValues().get("nome - 4");
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Ricardo fodao", columnNome.get(0));
@@ -132,17 +141,17 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnCPF.size());
         Assert.assertEquals("89042100", columnCPF.get(0));
     }
-    
+
     @Test
     public void testInsert_Select002() {
         CommandResult result = compileAndExecute("INSERT INTO usuario (cod, codEmp, nome, cpf) values (1, 1, \"Ricardo fodao\", \"89042100\");");
-     
+
         result = compileAndExecute("SELECT usuario.* FROM usuario;");
 
         List<String> columnCod = result.getValues().get("cod - 1");
         Assert.assertEquals(1, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
-        
+
         List<String> columnCodEmp = result.getValues().get("codEmp - 2");
         Assert.assertEquals(1, columnCodEmp.size());
         Assert.assertEquals("1", columnCodEmp.get(0));
@@ -150,7 +159,7 @@ public class IntegrationTest {
         List<String> columnCodCargo = result.getValues().get("codCargo - 3");
         Assert.assertEquals(1, columnCodCargo.size());
         Assert.assertEquals("0", columnCodCargo.get(0));
-        
+
         List<String> columnNome = result.getValues().get("nome - 4");
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Ricardo fodao", columnNome.get(0));
@@ -159,17 +168,17 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnCPF.size());
         Assert.assertEquals("89042100", columnCPF.get(0));
     }
-    
+
     @Test
     public void testInsert_Select003() {
         CommandResult result = compileAndExecute("INSERT INTO usuario (nome, cpf) values (\"Ricardo fodao\", \"89042100\");");
-     
+
         result = compileAndExecute("SELECT usuario.* FROM usuario;");
 
         List<String> columnCod = result.getValues().get("cod - 1");
         Assert.assertEquals(1, columnCod.size());
         Assert.assertEquals("0", columnCod.get(0));
-        
+
         List<String> columnCodEmp = result.getValues().get("codEmp - 2");
         Assert.assertEquals(1, columnCodEmp.size());
         Assert.assertEquals("0", columnCodEmp.get(0));
@@ -177,7 +186,7 @@ public class IntegrationTest {
         List<String> columnCodCargo = result.getValues().get("codCargo - 3");
         Assert.assertEquals(1, columnCodCargo.size());
         Assert.assertEquals("0", columnCodCargo.get(0));
-        
+
         List<String> columnNome = result.getValues().get("nome - 4");
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Ricardo fodao", columnNome.get(0));
@@ -186,17 +195,17 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnCPF.size());
         Assert.assertEquals("89042100", columnCPF.get(0));
     }
-    
+
     @Test
     public void testInsert_Select004() {
         CommandResult result = compileAndExecute("INSERT INTO usuario (nome, cod) values (\"Ricardo fodao\", 1);");
-     
+
         result = compileAndExecute("SELECT usuario.* FROM usuario;");
 
         List<String> columnCod = result.getValues().get("cod - 1");
         Assert.assertEquals(1, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
-        
+
         List<String> columnCodEmp = result.getValues().get("codEmp - 2");
         Assert.assertEquals(1, columnCodEmp.size());
         Assert.assertEquals("0", columnCodEmp.get(0));
@@ -204,7 +213,7 @@ public class IntegrationTest {
         List<String> columnCodCargo = result.getValues().get("codCargo - 3");
         Assert.assertEquals(1, columnCodCargo.size());
         Assert.assertEquals("0", columnCodCargo.get(0));
-        
+
         List<String> columnNome = result.getValues().get("nome - 4");
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Ricardo fodao", columnNome.get(0));
@@ -213,17 +222,17 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnCPF.size());
         Assert.assertEquals("", columnCPF.get(0));
     }
-    
+
     @Test
     public void testInsert_Select005() {
         CommandResult result = compileAndExecute("INSERT INTO usuario (codCargo, cod, cpf) values (2, 1, \"12345678\");");
-     
+
         result = compileAndExecute("SELECT usuario.* FROM usuario;");
 
         List<String> columnCod = result.getValues().get("cod - 1");
         Assert.assertEquals(1, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
-        
+
         List<String> columnCodEmp = result.getValues().get("codEmp - 2");
         Assert.assertEquals(1, columnCodEmp.size());
         Assert.assertEquals("0", columnCodEmp.get(0));
@@ -231,7 +240,7 @@ public class IntegrationTest {
         List<String> columnCodCargo = result.getValues().get("codCargo - 3");
         Assert.assertEquals(1, columnCodCargo.size());
         Assert.assertEquals("2", columnCodCargo.get(0));
-        
+
         List<String> columnNome = result.getValues().get("nome - 4");
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("", columnNome.get(0));
@@ -240,17 +249,17 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnCPF.size());
         Assert.assertEquals("12345678", columnCPF.get(0));
     }
-    
+
     @Test
     public void testInsert_Select006() {
         CommandResult result = compileAndExecute("INSERT INTO usuario (codCargo, cod) values (2, 1);");
-     
+
         result = compileAndExecute("SELECT usuario.* FROM usuario;");
 
         List<String> columnCod = result.getValues().get("cod - 1");
         Assert.assertEquals(1, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
-        
+
         List<String> columnCodEmp = result.getValues().get("codEmp - 2");
         Assert.assertEquals(1, columnCodEmp.size());
         Assert.assertEquals("0", columnCodEmp.get(0));
@@ -258,7 +267,7 @@ public class IntegrationTest {
         List<String> columnCodCargo = result.getValues().get("codCargo - 3");
         Assert.assertEquals(1, columnCodCargo.size());
         Assert.assertEquals("2", columnCodCargo.get(0));
-        
+
         List<String> columnNome = result.getValues().get("nome - 4");
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("", columnNome.get(0));
@@ -308,7 +317,7 @@ public class IntegrationTest {
         Assert.assertEquals("Gabriel", columnNome.get(10));
         Assert.assertEquals("Juca", columnNome.get(11));
     }
-    
+
     @Test
     public void testSelect003() {
         insertValues();
@@ -318,7 +327,7 @@ public class IntegrationTest {
         List<String> columnNome = result.getValues().get("nome - 1");
         Assert.assertEquals(108, columnNome.size());
     }
-    
+
     @Test
     public void testSelect004() {
         insertValues();
@@ -328,7 +337,7 @@ public class IntegrationTest {
         List<String> columnNome = result.getValues().get("nome - 1");
         Assert.assertEquals(36, columnNome.size());
     }
-    
+
     @Test
     public void testSelect005() {
         insertValues();
@@ -349,7 +358,7 @@ public class IntegrationTest {
         Assert.assertEquals("Juca", columnNome.get(9));
         Assert.assertEquals("Gabriel", columnNome.get(10));
         Assert.assertEquals("Gabriel", columnNome.get(11));
-        
+
         List<String> columnCod = result.getValues().get("cod - 2");
         Assert.assertEquals(12, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
@@ -364,7 +373,7 @@ public class IntegrationTest {
         Assert.assertEquals("2", columnCod.get(9));
         Assert.assertEquals("3", columnCod.get(10));
         Assert.assertEquals("3", columnCod.get(11));
-        
+
         List<String> columnName = result.getValues().get("nome - 3");
         Assert.assertEquals(12, columnName.size());
         Assert.assertEquals("Programador", columnName.get(0));
@@ -380,7 +389,7 @@ public class IntegrationTest {
         Assert.assertEquals("Projetista", columnName.get(10));
         Assert.assertEquals("Projetista", columnName.get(11));
     }
-    
+
     @Test
     public void testSelect006() {
         insertValues();
@@ -401,7 +410,7 @@ public class IntegrationTest {
         Assert.assertEquals("Daniel", columnNome.get(9));
         Assert.assertEquals("Gabriel", columnNome.get(10));
         Assert.assertEquals("Juca", columnNome.get(11));
-        
+
         List<String> columnCod = result.getValues().get("cod - 2");
         Assert.assertEquals(36, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
@@ -441,7 +450,7 @@ public class IntegrationTest {
         Assert.assertEquals("3", columnCod.get(34));
         Assert.assertEquals("3", columnCod.get(35));
     }
-    
+
     @Test
     public void testSelect007() {
         insertValues();
@@ -461,7 +470,7 @@ public class IntegrationTest {
         Assert.assertEquals("Ricardo fodao", columnNome.get(8));
         Assert.assertEquals("Ricardo fodao", columnNome.get(9));
         Assert.assertEquals("Gabriel", columnNome.get(10));
-        
+
         List<String> columnCod = result.getValues().get("cod - 2");
         Assert.assertEquals(11, columnCod.size());
         Assert.assertEquals("1", columnCod.get(0));
@@ -486,7 +495,7 @@ public class IntegrationTest {
         List<String> columnNome = result.getValues().get("cod - 1");
         Assert.assertEquals(0, columnNome.size());
     }
-    
+
     @Test
     public void testSelect009() {
         insertValues();
@@ -499,7 +508,7 @@ public class IntegrationTest {
         Assert.assertEquals("2", columnNome.get(1));
         Assert.assertEquals("3", columnNome.get(2));
     }
-    
+
     @Test
     public void testSelect010() {
         insertValues();
@@ -512,7 +521,7 @@ public class IntegrationTest {
         Assert.assertEquals("2", columnNome.get(1));
         Assert.assertEquals("3", columnNome.get(2));
     }
-    
+
     @Test
     public void testSelect011() {
         insertValues();
@@ -525,7 +534,7 @@ public class IntegrationTest {
         Assert.assertEquals("2", columnNome.get(1));
         Assert.assertEquals("3", columnNome.get(2));
     }
-    
+
     @Test
     public void testSelect012() {
         insertValues();
@@ -538,7 +547,7 @@ public class IntegrationTest {
         Assert.assertEquals("2", columnNome.get(1));
         Assert.assertEquals("3", columnNome.get(2));
     }
-    
+
     @Test
     public void testSelect013() {
         insertValues();
@@ -551,7 +560,7 @@ public class IntegrationTest {
         Assert.assertEquals("2", columnNome.get(1));
         Assert.assertEquals("3", columnNome.get(2));
     }
-    
+
     @Test
     public void testSelect014() {
         insertValues();
@@ -561,7 +570,7 @@ public class IntegrationTest {
         List<String> columnNome = result.getValues().get("cod - 1");
         Assert.assertEquals(0, columnNome.size());
     }
-    
+
     @Test
     public void testSelect015() {
         insertValues();
@@ -572,7 +581,7 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Furb", columnNome.get(0));
     }
-    
+
     @Test
     public void testSelect016() {
         insertValues();
@@ -583,7 +592,7 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Furb", columnNome.get(0));
     }
-    
+
     @Test
     public void testSelect017() {
         insertValues();
@@ -594,7 +603,7 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Furb", columnNome.get(0));
     }
-    
+
     @Test
     public void testSelect018() {
         insertValues();
@@ -606,7 +615,7 @@ public class IntegrationTest {
         Assert.assertEquals("Furb", columnNome.get(0));
         Assert.assertEquals("TSystems", columnNome.get(1));
     }
-    
+
     @Test
     public void testSelect019() {
         insertValues();
@@ -618,7 +627,7 @@ public class IntegrationTest {
         Assert.assertEquals("Furb", columnNome.get(0));
         Assert.assertEquals("TSystems", columnNome.get(1));
     }
-    
+
     @Test
     public void testSelect020() {
         insertValues();
@@ -629,7 +638,7 @@ public class IntegrationTest {
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("TSystems", columnNome.get(0));
     }
-    
+
     @Test
     public void testSelect021() {
         insertValues();
@@ -639,7 +648,7 @@ public class IntegrationTest {
         List<String> columnNome = result.getValues().get("nome - 1");
         Assert.assertEquals(0, columnNome.size());
     }
-    
+
     @Test
     public void testSelect022() {
         insertValues();
@@ -653,12 +662,12 @@ public class IntegrationTest {
         List<String> columnUF = result.getValues().get("uf - 2");
         Assert.assertEquals(1, columnUF.size());
         Assert.assertEquals("SC", columnUF.get(0));
-        
+
         List<String> columnNomeCargo = result.getValues().get("nome - 3");
         Assert.assertEquals(1, columnNomeCargo.size());
         Assert.assertEquals("Projetista", columnNomeCargo.get(0));
     }
-    
+
     @Test
     public void testSelect023() {
         insertValues();
@@ -676,24 +685,24 @@ public class IntegrationTest {
         Assert.assertEquals("SC", columnUF.get(0));
         Assert.assertEquals("SC", columnUF.get(1));
         Assert.assertEquals("SC", columnUF.get(2));
-        
+
         List<String> columnNomeCargo = result.getValues().get("nome - 3");
         Assert.assertEquals(3, columnNomeCargo.size());
         Assert.assertEquals("Programador", columnNomeCargo.get(0));
         Assert.assertEquals("Programador", columnNomeCargo.get(1));
         Assert.assertEquals("Programador", columnNomeCargo.get(2));
     }
-    
+
     @Test
     public void testSelect024() {
         insertValues();
 
         CommandResult result = compileAndExecute("SELECT usuario.nome, usuario.cod, usuario.codEmp, usuario.codCargo FROM usuario, empresa, cargo WHERE usuario.codEmp = empresa.cod AND usuario.codCargo = cargo.cod AND cargo.cod >= 3 AND empresa.nome = \"TSystems\" OR usuario.cod = 2 AND empresa.cod = 2 AND cargo.cod = 1 AND empresa.cod = usuario.codEmp AND cargo.cod = usuario.codCargo;");
-// 
+        // 
         List<String> columnNome = result.getValues().get("nome - 1");
         Assert.assertEquals(1, columnNome.size());
         Assert.assertEquals("Daniel", columnNome.get(0));
-        
+
         List<String> columnCodUsu = result.getValues().get("cod - 2");
         Assert.assertEquals(1, columnCodUsu.size());
         Assert.assertEquals("2", columnCodUsu.get(0));
@@ -701,18 +710,18 @@ public class IntegrationTest {
         List<String> columnUF = result.getValues().get("codEmp - 3");
         Assert.assertEquals(1, columnUF.size());
         Assert.assertEquals("2", columnUF.get(0));
-        
+
         List<String> columnNomeCargo = result.getValues().get("codCargo - 4");
         Assert.assertEquals(1, columnNomeCargo.size());
         Assert.assertEquals("1", columnNomeCargo.get(0));
     }
-    
+
     @Test
     public void testSelect025() {
         insertValues();
 
         CommandResult result = compileAndExecute("SELECT usuario.nome, usuario.cod, usuario.codEmp, usuario.codCargo FROM usuario, empresa, cargo WHERE empresa.cod = usuario.codEmp AND usuario.codCargo = cargo.cod AND usuario.nome = \"Gabriel\" OR usuario.nome = \"Juca\" AND empresa.cod = usuario.codEmp AND usuario.codCargo = cargo.cod;");
-// 
+        // 
         List<String> columnNome = result.getValues().get("nome - 1");
         Assert.assertEquals(6, columnNome.size());
         Assert.assertEquals("Juca", columnNome.get(0));
@@ -721,12 +730,11 @@ public class IntegrationTest {
         Assert.assertEquals("Juca", columnNome.get(3));
         Assert.assertEquals("Juca", columnNome.get(4));
         Assert.assertEquals("Gabriel", columnNome.get(5));
-        
+
         List<String> columnCodUsu = result.getValues().get("cod - 2");
         Assert.assertEquals(6, columnCodUsu.size());
         Assert.assertEquals("4", columnCodUsu.get(0));
         Assert.assertEquals("3", columnCodUsu.get(1));
-        
 
         List<String> columnUF = result.getValues().get("codEmp - 3");
         Assert.assertEquals(6, columnUF.size());
@@ -736,27 +744,27 @@ public class IntegrationTest {
         Assert.assertEquals("2", columnUF.get(3));
         Assert.assertEquals("3", columnUF.get(4));
         Assert.assertEquals("3", columnUF.get(5));
-        
+
         List<String> columnNomeCargo = result.getValues().get("codCargo - 4");
         Assert.assertEquals(6, columnNomeCargo.size());
         Assert.assertEquals("1", columnNomeCargo.get(0));
     }
-    
+
     @Test
     public void testPerformance001() {
-    	
+
     }
-    
+
     private void testPerformanceCreateAndInsert() {
-    	 if (FileManager.getDatabase("DatabaseTestePerformance") != null) {
-             FileManager.deleteDatabase("DatabaseTestePerformance");
-             DatabaseManager.INSTANCE.getDatabases().remove("DatabaseTestePerformance");
-         }
-         compileAndExecute("CREATE DATABASE DatabaseTestePerformance;");
-         compileAndExecute("SET DATABASE DatabaseTestePerformance;");
-         compileAndExecute("CREATE TABLE bairro (  cd_bairro INTEGER,  nm_bairro VARCHAR(75),  sg_uf CHAR(2));");
-         compileAndExecute("CREATE TABLE localidade (  cd_localidade INTEGER, nm_localidade VARCHAR(60),  nr_cep CHAR(8),  sg_uf CHAR(2)); ");
-         compileAndExecute("CREATE TABLE logradouro(  cd_logradouro INTEGER,  cd_localidade INTEGER,  cd_bairro INTEGER,  tp_logradouro VARCHAR(30),  nm_logradouro VARCHAR(70),  nr_cep CHAR(8),  sg_uf CHAR(2));");
+        if (FileManager.getDatabase("DatabaseTestePerformance") != null) {
+            FileManager.deleteDatabase("DatabaseTestePerformance");
+            DatabaseManager.INSTANCE.getDatabases().remove("DatabaseTestePerformance");
+        }
+        compileAndExecute("CREATE DATABASE DatabaseTestePerformance;");
+        compileAndExecute("SET DATABASE DatabaseTestePerformance;");
+        compileAndExecute("CREATE TABLE bairro (  cd_bairro INTEGER,  nm_bairro VARCHAR(75),  sg_uf CHAR(2));");
+        compileAndExecute("CREATE TABLE localidade (  cd_localidade INTEGER, nm_localidade VARCHAR(60),  nr_cep CHAR(8),  sg_uf CHAR(2)); ");
+        compileAndExecute("CREATE TABLE logradouro(  cd_logradouro INTEGER,  cd_localidade INTEGER,  cd_bairro INTEGER,  tp_logradouro VARCHAR(30),  nm_logradouro VARCHAR(70),  nr_cep CHAR(8),  sg_uf CHAR(2));");
     }
-    
+
 }
