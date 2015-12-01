@@ -62,6 +62,11 @@ public class JoinUtils {
         public ITableDef tableDef;
         public List<AbstractValueComparator> tableComparators = new ArrayList<>();
         public HashMap<ITableDef, List<AbstractValueComparator>> joinConditions = new HashMap<>();
+        
+        /**
+         *  Em casos em que a tabela não está envolvida em uma cláusula OR, é necessário carregar todos, pois não sabemos os valores para uma busca fina.
+         */
+		public boolean forceLoadAll;
 
         public TableJoinRegistry() {
             this(10);
@@ -132,45 +137,47 @@ public class JoinUtils {
     private static Set<Integer> getValidIndexes(IRegistry actualMergedRegistry, TableJoinRegistry tableJoinRegistry) {
         Set<Integer> result = new LinkedHashSet<>();
         boolean addAll = true;
-        if (tableJoinRegistry.tableComparators != null) {
-            for (AbstractValueComparator actualComparator : tableJoinRegistry.tableComparators) {
-                Index index = tableJoinRegistry.tableDef.getIndex(actualComparator.getColumnLeft());
-                // Se não tiver índice e for tabelaA.campoA = tabelaA.campoB, então não temos como otimizar... adiciona todos os registros...
-                if (index == null || actualComparator.getColumnRight() != null) {
-                    addAll = true;
-                    break;
-                }
-                addAll = false;
-                result.addAll(actualComparator.getIndexes(index, actualComparator.getConstantValue()));
-            }
-        }
-
-        if (tableJoinRegistry.joinConditions != null && !addAll) {
-            outer: for (Entry<ITableDef, List<AbstractValueComparator>> entry : tableJoinRegistry.joinConditions.entrySet()) {
-                for (AbstractValueComparator comparator : entry.getValue()) {
-
-                    if (actualMergedRegistry.columnValue.containsKey(comparator.getColumnLeft())) {
-                        Index index = tableJoinRegistry.tableDef.getIndex(comparator.getColumnRight());
-                        if (index == null) {
-                            addAll = true;
-                            break outer;
-                        }
-                        addAll = false;
-                        result.addAll(comparator.getIndexes(index, actualMergedRegistry.columnValue.get(comparator.getColumnLeft())));
-
-                        // Bem escroto mermo
-                    } else if (actualMergedRegistry.columnValue.containsKey(comparator.getColumnRight())) {
-                        Index index = tableJoinRegistry.tableDef.getIndex(comparator.getColumnLeft());
-                        if (index == null) {
-                            addAll = true;
-                            break outer;
-                        }
-                        addAll = false;
-                        result.addAll(comparator.getIndexes(index, actualMergedRegistry.columnValue.get(comparator.getColumnRight())));
-                    }
-
-                }
-            }
+        if (!tableJoinRegistry.forceLoadAll) {
+	        if (tableJoinRegistry.tableComparators != null) {
+	            for (AbstractValueComparator actualComparator : tableJoinRegistry.tableComparators) {
+	                Index index = tableJoinRegistry.tableDef.getIndex(actualComparator.getColumnLeft());
+	                // Se não tiver índice e for tabelaA.campoA = tabelaA.campoB, então não temos como otimizar... adiciona todos os registros...
+	                if (index == null || actualComparator.getColumnRight() != null) {
+	                    addAll = true;
+	                    break;
+	                }
+	                addAll = false;
+	                result.addAll(actualComparator.getIndexes(index, actualComparator.getConstantValue()));
+	            }
+	        }
+	
+	        if (tableJoinRegistry.joinConditions != null && !addAll) {
+	            outer: for (Entry<ITableDef, List<AbstractValueComparator>> entry : tableJoinRegistry.joinConditions.entrySet()) {
+	                for (AbstractValueComparator comparator : entry.getValue()) {
+	
+	                    if (actualMergedRegistry.columnValue.containsKey(comparator.getColumnLeft())) {
+	                        Index index = tableJoinRegistry.tableDef.getIndex(comparator.getColumnRight());
+	                        if (index == null) {
+	                            addAll = true;
+	                            break outer;
+	                        }
+	                        addAll = false;
+	                        result.addAll(comparator.getIndexes(index, actualMergedRegistry.columnValue.get(comparator.getColumnLeft())));
+	
+	                        // Bem escroto mermo
+	                    } else if (actualMergedRegistry.columnValue.containsKey(comparator.getColumnRight())) {
+	                        Index index = tableJoinRegistry.tableDef.getIndex(comparator.getColumnLeft());
+	                        if (index == null) {
+	                            addAll = true;
+	                            break outer;
+	                        }
+	                        addAll = false;
+	                        result.addAll(comparator.getIndexes(index, actualMergedRegistry.columnValue.get(comparator.getColumnRight())));
+	                    }
+	
+	                }
+	            }
+	        }
         }
 
         if (addAll) {

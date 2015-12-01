@@ -27,7 +27,7 @@ import database.storage.FileManager;
  */
 public class IntegrationTest {
 
-    private CommandResult compileAndExecute(String sql) {
+    protected CommandResult compileAndExecute(String sql) {
         Lexico lexico = new Lexico(sql);
         Sintatico sintatico = new Sintatico();
 
@@ -46,7 +46,7 @@ public class IntegrationTest {
         return result;
     }
 
-    private void insertValues() {
+    protected void insertValues() {
         compileAndExecute("INSERT INTO usuario (cod, codEmp, codCargo, nome, cpf) values (1, 1, 1, \"Ricardo fodao\", \"89042100\");\n" + // 
         "INSERT INTO usuario (cod, codEmp, codCargo, nome, cpf) values (2, 1, 1, \"Daniel\", \"32145678\");\n" + // 
         "INSERT INTO usuario (cod, codEmp, codCargo, nome, cpf) values (3, 1, 3, \"Gabriel\", \"45612378\");\n" + // 
@@ -740,6 +740,23 @@ public class IntegrationTest {
         List<String> columnNomeCargo = result.getValues().get("codCargo - 4");
         Assert.assertEquals(6, columnNomeCargo.size());
         Assert.assertEquals("1", columnNomeCargo.get(0));
+    }
+    
+    @Test
+    public void testPerformance001() {
+    	
+    }
+    
+    private void testPerformanceCreateAndInsert() {
+    	 if (FileManager.getDatabase("DatabaseTestePerformance") != null) {
+             FileManager.deleteDatabase("DatabaseTestePerformance");
+             DatabaseManager.INSTANCE.getDatabases().remove("DatabaseTestePerformance");
+         }
+         compileAndExecute("CREATE DATABASE DatabaseTestePerformance;");
+         compileAndExecute("SET DATABASE DatabaseTestePerformance;");
+         compileAndExecute("CREATE TABLE bairro (  cd_bairro INTEGER,  nm_bairro VARCHAR(75),  sg_uf CHAR(2));");
+         compileAndExecute("CREATE TABLE localidade (  cd_localidade INTEGER, nm_localidade VARCHAR(60),  nr_cep CHAR(8),  sg_uf CHAR(2)); ");
+         compileAndExecute("CREATE TABLE logradouro(  cd_logradouro INTEGER,  cd_localidade INTEGER,  cd_bairro INTEGER,  tp_logradouro VARCHAR(30),  nm_logradouro VARCHAR(70),  nr_cep CHAR(8),  sg_uf CHAR(2));");
     }
     
 }

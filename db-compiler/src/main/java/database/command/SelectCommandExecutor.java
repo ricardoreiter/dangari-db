@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import database.manager.DatabaseManager;
 import database.metadata.interfaces.IColumnDef;
@@ -43,13 +44,15 @@ public class SelectCommandExecutor implements ICommandExecutor {
     private Map<ITableDef, List<AbstractValueComparator>> tableComparators;
     private Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators;
     private List<IColumnDef> selectedColumns;
+    private Set<ITableDef> forceLoadAllTableList;
 
-    public SelectCommandExecutor(List<ITableDef> tableList, ArrayList<AbstractBooleanComparator> whereConditionsLogicalOperators, Map<ITableDef, List<AbstractValueComparator>> tableComparators, Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators, List<IColumnDef> selectedColumns) {
+    public SelectCommandExecutor(List<ITableDef> tableList, ArrayList<AbstractBooleanComparator> whereConditionsLogicalOperators, Map<ITableDef, List<AbstractValueComparator>> tableComparators, Map<ITableDef, HashMap<ITableDef, List<AbstractValueComparator>>> tableJoinComparators, List<IColumnDef> selectedColumns, Set<ITableDef> tablesToForceLoadAll) {
         this.tableList = tableList;
         this.whereConditionsLogicalOperators = whereConditionsLogicalOperators;
         this.tableComparators = tableComparators;
         this.tableJoinComparators = tableJoinComparators;
         this.selectedColumns = selectedColumns;
+        this.forceLoadAllTableList = tablesToForceLoadAll;
     }
 
     @Override
@@ -64,6 +67,7 @@ public class SelectCommandExecutor implements ICommandExecutor {
             tableJoinRegistry.joinConditions = tableJoinComparators.get(tableDef);
             tableJoinRegistry.tableComparators = tableComparators.get(tableDef);
             tableJoinRegistry.registrys = database.getRecords(tableDef);
+            tableJoinRegistry.forceLoadAll = forceLoadAllTableList.contains(tableDef);
             tablesJoinRegistry[i] = tableJoinRegistry;
             i++;
         }

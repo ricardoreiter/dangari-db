@@ -432,7 +432,7 @@ public class JoinUtilsTest {
     /**
      * @param tableUsuario
      */
-    private void createRegistry(TableJoinRegistry tableUsuario, int cod, String nome) {
+    protected void createRegistry(TableJoinRegistry tableUsuario, int cod, String nome) {
         IRegistry registro = new IRegistry();
         registro.columnValue.put(tableUsuario.tableDef.getColumnDef("cod"), new Integer(cod));
         registro.columnValue.put(tableUsuario.tableDef.getColumnDef("nome"), nome);

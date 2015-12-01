@@ -2,9 +2,11 @@ package database.command.compiler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import database.command.ICommandExecutor;
 import database.command.SelectCommandExecutor;
@@ -146,9 +148,52 @@ public class SelectCommandCompiler implements ICommandCompiler {
         for (WhereCondition whereCondition : whereConditions) {
             checkWhere(database, whereCondition, tableComparators, tableJoinComparators);
         }
+        
+        Set<ITableDef> tablesToForceLoadAll = new HashSet<>();
+        checkTablesToForceLoadAll(database, tables, tablesToForceLoadAll);
 
-        return new SelectCommandExecutor(tables, getLogicalComparators(), tableComparators, tableJoinComparators, selectedColumns);
+        return new SelectCommandExecutor(tables, getLogicalComparators(), tableComparators, tableJoinComparators, selectedColumns, tablesToForceLoadAll);
     }
+
+    /**
+     * Em casos como "SELECT tA.c1 FROM tA, tB WHERE tA.c1 = tB.c1 OR tA.c1 > 10", somos obrigados a forçar o carregamento completo da "tB", pois possuímos um OR que não envolve ela
+     */
+	private void checkTablesToForceLoadAll(IDatabaseDef database, List<ITableDef> tables, Set<ITableDef> tablesToForceLoadAll) throws SemanticError {
+		Set<ITableDef> envolvedTablesInWhere = new HashSet<>();
+        for (int i = 0; i < whereConditions.size(); i++) {
+        	ITableDef leftTable = getWhereTableDef(database, whereConditions.get(i).left);
+        	envolvedTablesInWhere.add(leftTable);
+        	
+        	if (whereConditions.get(i).dataType == CompilerDataType.FIELD) {
+        		ITableDef rightTable = getWhereTableDef(database, whereConditions.get(i).right);
+        		envolvedTablesInWhere.add(rightTable);
+        	}
+
+        	if (whereConditions.size() == i + 1) {
+        		for (ITableDef table : tables) {
+        			if (!envolvedTablesInWhere.contains(table)) {
+        				tablesToForceLoadAll.add(table);
+        			}
+        		}
+        	} else {
+        	
+	        	String comparator = whereLogicalConditions.get(i);
+	            switch (comparator.toLowerCase()) {
+	                case "or":
+	                	for (ITableDef table : tables) {
+	            			if (!envolvedTablesInWhere.contains(table)) {
+	            				tablesToForceLoadAll.add(table);
+	            			}
+	            		}
+	                    envolvedTablesInWhere = new HashSet<ITableDef>();
+	                    break;
+	                default:
+	                    
+	                    break;
+	            }
+        	}
+        }
+	}
 
     private ArrayList<AbstractBooleanComparator> getLogicalComparators() {
         ArrayList<AbstractBooleanComparator> result = new ArrayList<AbstractBooleanComparator>();

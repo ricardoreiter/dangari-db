@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import database.metadata.DataType;
 import database.metadata.Index;
@@ -27,16 +28,16 @@ public class DatabaseStorage {
 
         int index = tableDef.getRowsCount();
 
-        for (IColumnDef iColumnDef : columns) {
-            Index indexObject = tableDef.getIndex(iColumnDef);
+        for (Entry<IColumnDef, String> entry : columnValue.entrySet()) {
+            Index indexObject = tableDef.getIndex(entry.getKey());
             if (indexObject != null) {
                 Object value;
-                if (iColumnDef.getDataType() == DataType.INTEGER) {
-                    value = new Integer(columnValue.get(iColumnDef));
+                if (entry.getKey().getDataType() == DataType.INTEGER) {
+                    value = new Integer(entry.getValue());
                 } else {
-                    value = columnValue.get(iColumnDef);
+                    value = columnValue.get(entry.getKey());
                 }
-                DefStorage.updateIndex(file, iColumnDef, value, indexObject, index);
+                DefStorage.updateIndex(file, entry.getKey(), value, indexObject, index);
             }
         }
 
