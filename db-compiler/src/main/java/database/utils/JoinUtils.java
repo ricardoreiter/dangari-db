@@ -151,7 +151,7 @@ public class JoinUtils {
 	            }
 	        }
 	
-	        if (tableJoinRegistry.joinConditions != null && !addAll) {
+	        if (tableJoinRegistry.joinConditions != null && (!addAll || tableJoinRegistry.tableComparators == null)) {
 	            outer: for (Entry<ITableDef, List<AbstractValueComparator>> entry : tableJoinRegistry.joinConditions.entrySet()) {
 	                for (AbstractValueComparator comparator : entry.getValue()) {
 	
