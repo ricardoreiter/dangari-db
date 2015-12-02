@@ -3,7 +3,6 @@ package database.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,8 +67,8 @@ public class JoinUtils {
         public List<AbstractValueComparator> tableComparators = new ArrayList<>();
         public HashMap<ITableDef, List<AbstractValueComparator>> joinConditions = new HashMap<>();
         
-        public Set<Integer> preLoadedValidIndexes = new HashSet<>();
-        public List<AbstractValueComparator> preLoadedComparators = new LinkedList<AbstractValueComparator>();
+//        public Set<Integer> preLoadedValidIndexes = new HashSet<>();
+//        public List<AbstractValueComparator> preLoadedComparators = new LinkedList<AbstractValueComparator>();
 
         /**
          * Em casos em que a tabela não está envolvida em uma cláusula OR, é necessário carregar todos, pois não sabemos
@@ -87,14 +86,42 @@ public class JoinUtils {
 
         @Override
         public int compareTo(TableJoinRegistry o) {
-            if (o == this || o.registrys.size() == this.registrys.size()) {
-                return 0;
-            }
-
-            if (o.registrys.size() > this.registrys.size()) {
-                return -1;
-            }
-            return 1;
+        	if (o == this) {
+        		return 0;
+        	}
+        	
+        	List<AbstractValueComparator> otherTableComparators = o.tableComparators;
+        	if (otherTableComparators == null) {
+        		if (this.tableComparators == null) {
+        			return 0;
+        		}
+        		if (this.tableComparators.size() > 0) {
+        			return -1;
+        		}
+        		return 0;
+        	} else if (this.tableComparators == null) {
+        		if (otherTableComparators.size() > 0) {
+        			return 1;
+        		}
+        		return 0;
+        	}
+        	
+			if (otherTableComparators.size() == this.tableComparators.size()) {
+        		if (o.registrys.size() == this.registrys.size()) {
+        			return 0;
+        		}
+        		
+        		if (o.registrys.size() > this.registrys.size()) {
+        			return 1;
+        		}
+        		return -1;
+        	}
+        	
+        	if (otherTableComparators.size() > this.tableComparators.size()) {
+        		return -1;
+        	}
+        	
+        	return 1;
         }
 
     }
@@ -158,28 +185,22 @@ public class JoinUtils {
      */
     private static Set<Integer> getValidIndexes(IRegistry actualMergedRegistry, TableJoinRegistry tableJoinRegistry) {
         Set<Integer> result = new LinkedHashSet<>();
-        result.addAll(tableJoinRegistry.preLoadedValidIndexes);
         boolean addAll = true;
         if (!tableJoinRegistry.forceLoadAll) {
             if (tableJoinRegistry.tableComparators != null) {
                 for (AbstractValueComparator actualComparator : tableJoinRegistry.tableComparators) {
-                	if (!tableJoinRegistry.preLoadedComparators.contains(actualComparator)) {
-	                    Index index = tableJoinRegistry.tableDef.getIndex(actualComparator.getColumnLeft());
-	
-	                    // Se não tiver índice e for tabelaA.campoA = tabelaA.campoB, então não temos como otimizar... adiciona todos os registros...
-	                    if (index == null && createTemporaryIndex && actualComparator.getColumnRight() == null) {
-	                        index = createTemporaryIndex(actualComparator.getColumnLeft(), tableJoinRegistry.registrys);
-	                        tableJoinRegistry.tableDef.addIndex(actualComparator.getColumnLeft(), index);
-	                    } else if (index == null || actualComparator.getColumnRight() != null) {
-	                        addAll = true;
-	                        break;
-	                    }
-	                    addAll = false;
-	                    LinkedList<Integer> indexes = actualComparator.getIndexes(index, actualComparator.getConstantValue());
-	                    tableJoinRegistry.preLoadedValidIndexes.addAll(indexes);
-	                    tableJoinRegistry.preLoadedComparators.add(actualComparator);
-						result.addAll(indexes);
-                	}
+                    Index index = tableJoinRegistry.tableDef.getIndex(actualComparator.getColumnLeft());
+
+                    // Se não tiver índice e for tabelaA.campoA = tabelaA.campoB, então não temos como otimizar... adiciona todos os registros...
+                    if (index == null && createTemporaryIndex && actualComparator.getColumnRight() == null) {
+                        index = createTemporaryIndex(actualComparator.getColumnLeft(), tableJoinRegistry.registrys);
+                        tableJoinRegistry.tableDef.addIndex(actualComparator.getColumnLeft(), index);
+                    } else if (index == null || actualComparator.getColumnRight() != null) {
+                        addAll = true;
+                        break;
+                    }
+                    addAll = false;
+					result.addAll(actualComparator.getIndexes(index, actualComparator.getConstantValue()));
                 }
             }
 
